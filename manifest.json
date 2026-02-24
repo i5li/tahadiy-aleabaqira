@@ -1,0 +1,11 @@
+{
+  "background_color": "#ffffff",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "تحدي العباقرة",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "تحدي العباقرة",
+  "start_url": "/",
+  "theme_color": "#FF9F43"
+}
