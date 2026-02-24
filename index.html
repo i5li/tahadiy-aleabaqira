@@ -1,0 +1,1923 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="تحدي العباقرة">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#FF9F43">
+    <title>تحدي العباقرة</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #FFF5E4;
+            --surface: #FFFFFF;
+            --primary: #FF9F43;
+            --primary-dark: #E67E22;
+            --secondary: #54A0FF;
+            --secondary-dark: #2E86DE;
+            --accent: #FECA57;
+            --danger: #FF6B6B;
+            --success: #1DD1A1;
+            --success-dark: #10AC84;
+            --text: #2D3436;
+            --text-muted: #636e72;
+            --radius-btn: 50px;
+            --radius-card: 24px;
+            --border-width: 3px;
+            --border-color: #2D3436;
+            --shadow-hard: 5px 5px 0px rgba(45, 52, 54, 1);
+            --safe-top: env(safe-area-inset-top, 0px);
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'IBM Plex Sans Arabic', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        html {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text);
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+
+        .bg-pattern {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            background-image: radial-gradient(#F39C12 2px, transparent 2px);
+            background-size: 30px 30px;
+            animation: moveGrid 20s linear infinite;
+        }
+
+        @keyframes moveGrid {
+            0% { background-position: 0 0; }
+            100% { background-position: 30px 30px; }
+        }
+
+        #app {
+            width: 100%;
+            max-width: 480px;
+            height: 100%;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+        }
+
+        /* ─── TOP BAR ─── */
+        .top-bar {
+            height: 60px;
+            min-height: 60px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            background: var(--surface);
+            border-bottom: var(--border-width) solid var(--border-color);
+            box-shadow: 0 4px 0 rgba(0,0,0,0.05);
+            z-index: 50;
+            padding-top: var(--safe-top);
+        }
+
+        .top-bar-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--primary-dark);
+        }
+
+        .icon-btn {
+            background: var(--surface);
+            border: var(--border-width) solid var(--border-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            min-width: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 3px 3px 0px rgba(0,0,0,0.2);
+            transition: transform 0.1s;
+        }
+
+        .icon-btn:active {
+            transform: translate(3px, 3px);
+            box-shadow: 0px 0px 0px rgba(0,0,0,0.2);
+        }
+
+        .icon-btn svg { width: 22px; height: 22px; stroke-width: 2.5px; }
+        .icon-btn.danger svg { stroke: var(--danger); }
+        .icon-btn.hint svg { stroke: var(--accent); }
+        .icon-btn.settings svg { stroke: var(--text); }
+
+        /* ─── SCREENS ─── */
+        .screen {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.95);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: absolute;
+            top: 60px;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 0;
+            padding: 16px;
+            padding-bottom: calc(16px + var(--safe-bottom));
+        }
+
+        .screen.full-height {
+            top: 0;
+        }
+
+        .screen.active {
+            opacity: 1;
+            pointer-events: all;
+            transform: scale(1);
+            z-index: 10;
+        }
+
+        /* ─── TYPOGRAPHY ─── */
+        h1 {
+            font-size: 2.2rem;
+            text-align: center;
+            color: var(--primary-dark);
+            margin-bottom: 8px;
+            font-weight: 800;
+        }
+
+        h2 {
+            font-size: 1.6rem;
+            text-align: center;
+            color: var(--text);
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        p {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        /* ─── BUTTONS ─── */
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: var(--border-width) solid var(--border-color);
+            padding: 14px;
+            border-radius: var(--radius-btn);
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow-hard);
+            transition: all 0.1s;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            -webkit-appearance: none;
+        }
+
+        .btn:active {
+            transform: translate(5px, 5px);
+            box-shadow: 0px 0px 0px rgba(0,0,0,0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .btn-secondary { background-color: var(--secondary); }
+        .btn-success { background-color: var(--success); }
+        .btn-danger { background-color: var(--danger); }
+        .btn-accent { background-color: var(--accent); color: var(--text); }
+
+        /* ─── PLAYER SETUP ─── */
+        .input-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+            align-items: stretch;
+        }
+
+        .input-row input[type="text"] {
+            flex: 1;
+            min-width: 0;
+            padding: 14px 16px;
+            border-radius: var(--radius-btn);
+            border: var(--border-width) solid var(--border-color);
+            background: var(--surface);
+            font-size: 1rem;
+            outline: none;
+            box-shadow: 3px 3px 0px rgba(0,0,0,0.1);
+            font-weight: 600;
+            font-family: 'IBM Plex Sans Arabic', sans-serif;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .input-row input[type="text"]:focus {
+            border-color: var(--secondary);
+        }
+
+        .add-btn {
+            background: var(--primary);
+            border: var(--border-width) solid var(--border-color);
+            border-radius: 50%;
+            width: 52px;
+            min-width: 52px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow-hard);
+            transition: all 0.1s;
+            flex-shrink: 0;
+        }
+
+        .add-btn:active {
+            transform: translate(5px, 5px);
+            box-shadow: none;
+        }
+
+        .add-btn svg {
+            width: 26px;
+            height: 26px;
+            stroke: white;
+            stroke-width: 3px;
+        }
+
+        /* ─── PLAYER LIST ─── */
+        .player-list {
+            list-style: none;
+            padding: 2px;
+            margin-bottom: 12px;
+        }
+
+        .player-item {
+            background: var(--surface);
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            border-radius: 20px;
+            border: var(--border-width) solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 3px 3px 0px rgba(0,0,0,0.1);
+            animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .delete-btn {
+            background: var(--danger);
+            color: white;
+            border: 2px solid var(--border-color);
+            width: 34px;
+            height: 34px;
+            min-width: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 2px 2px 0px rgba(0,0,0,0.2);
+            flex-shrink: 0;
+        }
+
+        .delete-btn:active { transform: translate(2px, 2px); box-shadow: none; }
+        .delete-btn svg { width: 16px; height: 16px; stroke-width: 3px; }
+
+        /* ─── DIFFICULTY ─── */
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .btn-difficulty {
+            height: 72px;
+            flex-direction: row;
+            justify-content: flex-start;
+            background: var(--surface);
+            color: var(--text);
+            padding: 0 16px;
+            margin-bottom: 0;
+        }
+
+        .btn-difficulty svg {
+            width: 28px;
+            height: 28px;
+            margin-left: 12px;
+            stroke-width: 2.5px;
+            flex-shrink: 0;
+        }
+
+        .btn-difficulty-content {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .btn-difficulty span.sub {
+            font-size: 0.8rem;
+            font-weight: 400;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* ─── GAME SCREEN ─── */
+        .question-card {
+            background: var(--surface);
+            padding: 20px;
+            border-radius: var(--radius-card);
+            text-align: center;
+            margin-bottom: 12px;
+            border: var(--border-width) solid var(--border-color);
+            box-shadow: var(--shadow-hard);
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            animation: slideDown 0.4s ease-out;
+            flex-shrink: 0;
+        }
+
+        .question-icon {
+            width: 32px;
+            height: 32px;
+            margin-bottom: 8px;
+            stroke: var(--secondary);
+            stroke-width: 2.5px;
+        }
+
+        .question-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+            line-height: 1.4;
+        }
+
+        .host-info-card {
+            background: linear-gradient(135deg, #d4f5ec 0%, #b8f0e0 100%);
+            border: 2px solid var(--success-dark);
+            border-radius: 15px;
+            padding: 12px 14px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+            box-shadow: 3px 3px 0px rgba(16, 172, 132, 0.3);
+        }
+
+        .host-info-check {
+            flex-shrink: 0;
+            width: 32px;
+            height: 32px;
+            background: var(--success);
+            border: 2px solid var(--success-dark);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .host-info-check svg {
+            width: 18px;
+            height: 18px;
+            stroke: white;
+            stroke-width: 3px;
+        }
+
+        .host-info-text {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            min-width: 0;
+        }
+
+        .host-info-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--success-dark);
+            margin-bottom: 2px;
+        }
+
+        .host-info-answer {
+            font-weight: 800;
+            font-size: 1.05rem;
+            color: #0a6b52;
+            word-break: break-word;
+        }
+
+        /* ─── PLAYER GRID ─── */
+        .player-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 8px;
+        }
+
+        .player-btn {
+            background: var(--surface);
+            border: var(--border-width) solid var(--border-color);
+            border-radius: 20px;
+            padding: 16px 12px;
+            cursor: pointer;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 4px 4px 0px rgba(0,0,0,0.1);
+            transition: transform 0.1s;
+            display: flex;
+            min-height: 80px;
+        }
+
+        .player-btn:active {
+            transform: translate(4px, 4px);
+            box-shadow: 0px 0px 0px rgba(0,0,0,0.1);
+        }
+
+        .player-name {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 6px;
+            text-align: center;
+            word-break: break-word;
+        }
+
+        .player-score {
+            font-size: 2.5rem;
+            color: var(--secondary-dark);
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        /* ─── START SCREEN ─── */
+        #start-screen {
+            justify-content: space-between;
+        }
+
+        .mascot {
+            width: 90px;
+            height: 90px;
+            margin: 0 auto 16px;
+            background: var(--accent);
+            border: var(--border-width) solid var(--border-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            box-shadow: 6px 6px 0px rgba(0,0,0,0.15);
+            animation: bounce 2s infinite;
+            flex-shrink: 0;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+
+        /* ─── WINNER ─── */
+        .winner-name {
+            font-size: 2rem;
+            color: var(--primary-dark);
+            margin-bottom: 8px;
+            font-weight: 800;
+            text-align: center;
+        }
+
+        /* ─── MODALS ─── */
+        .modal-overlay {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-card {
+            background: var(--surface);
+            border: var(--border-width) solid var(--border-color);
+            border-radius: var(--radius-card);
+            padding: 24px;
+            width: 100%;
+            max-width: 340px;
+            text-align: center;
+            box-shadow: 10px 10px 0px rgba(0,0,0,0.2);
+            transform: scale(0.8);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .modal-overlay.active .modal-card {
+            transform: scale(1);
+        }
+
+        /* ─── BOTTOM SHEET ─── */
+        .bottom-sheet-overlay {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 105;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .bottom-sheet-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .bottom-sheet {
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 100%;
+            background: var(--surface);
+            border-top: var(--border-width) solid var(--border-color);
+            border-radius: 30px 30px 0 0;
+            padding: 24px;
+            padding-bottom: calc(24px + var(--safe-bottom));
+            z-index: 110;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .bottom-sheet.active {
+            transform: translateY(0);
+        }
+
+        /* ─── SETTINGS ─── */
+        .settings-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            background: var(--bg-color);
+            padding: 14px;
+            border-radius: 15px;
+            border: 2px solid var(--border-color);
+        }
+
+        .settings-label {
+            font-weight: 700;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        input[type="range"] {
+            width: 90px;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        /* ─── TOAST ─── */
+        .toast-container {
+            position: absolute;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 200;
+            width: 90%;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: var(--danger);
+            color: white;
+            padding: 10px 16px;
+            border-radius: 50px;
+            border: 2px solid var(--border-color);
+            font-weight: 700;
+            font-size: 0.9rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            animation: slideDown 0.3s ease-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+
+        /* ─── CONFETTI ─── */
+        #confetti-canvas {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 99;
+        }
+
+        /* ─── EMPTY STATE ─── */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 0;
+            opacity: 0.6;
+        }
+
+        .empty-state svg { width: 48px; height: 48px; margin-bottom: 8px; stroke: var(--text-muted); }
+        .empty-state p { font-size: 0.95rem; margin: 0; }
+
+        /* ─── ABOUT SCREEN ─── */
+        .about-card {
+            background: var(--surface);
+            padding: 20px;
+            border-radius: 20px;
+            border: 3px solid var(--border-color);
+            box-shadow: 5px 5px 0 rgba(0,0,0,0.1);
+        }
+
+        /* ─── ANIMATIONS ─── */
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-60px) scale(1.5); }
+        }
+
+        .float-score {
+            position: fixed;
+            color: var(--secondary-dark);
+            font-weight: 900;
+            font-size: 2.5rem;
+            pointer-events: none;
+            animation: floatUp 0.8s ease-out forwards;
+            z-index: 300;
+            text-shadow: 2px 2px 0 #fff, 2px 2px 0 var(--border-color);
+        }
+
+        /* ─── INSTALL BUTTON ─── */
+        #install-btn {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-pattern"></div>
+
+<div id="app">
+    <canvas id="confetti-canvas"></canvas>
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- TOP BAR -->
+    <div class="top-bar" id="top-bar" style="display: none;">
+        <button class="icon-btn" onclick="game.handleBack()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+        <div class="top-bar-title" id="top-bar-title">تحدي العباقرة</div>
+        <div style="display: flex; gap: 8px;">
+            <button class="icon-btn hint" id="hint-btn" onclick="game.openHint()" style="visibility: hidden;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6a2 2 0 0 1 2 2v1a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-1a2 2 0 0 1 2-2z"/><path d="M8.5 14c.5-3 2.5-5 3.5-5s3 2 3.5 5"/><path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7z"/></svg>
+            </button>
+            <button class="icon-btn settings" onclick="ui.openModal('settings-modal')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- START SCREEN -->
+    <div id="start-screen" class="screen full-height active">
+        <div style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; padding: 20px 0;">
+            <div class="mascot" style="background: var(--primary);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#2D3436" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:46px;height:46px;"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+            </div>
+            <h1>تحدي<br>العباقرة</h1>
+            <p>مسابقة الأسئلة التفاعلية<br>للمرح والمنافسة</p>
+        </div>
+        <div style="padding-bottom: 20px; width:100%; max-width:300px; margin:0 auto;">
+            <button class="btn" onclick="game.goToScreen('player-setup')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                ابدأ اللعبة
+            </button>
+            <button id="install-btn" class="btn btn-success" onclick="installApp()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                تثبيت التطبيق
+            </button>
+            <button class="btn btn-secondary" onclick="game.goToScreen('about')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                عن المطور
+            </button>
+            <button class="btn btn-accent" onclick="ui.openModal('settings-modal')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                الإعدادات
+            </button>
+        </div>
+    </div>
+
+    <!-- PLAYER SETUP SCREEN -->
+    <div id="player-setup-screen" class="screen">
+        <div class="input-row">
+            <input type="text" id="player-name-input" placeholder="اسم اللاعب..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" onkeypress="if(event.key==='Enter'){game.addPlayer();this.focus();}">
+            <button class="add-btn" onclick="game.addPlayer()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
+        </div>
+        <ul class="player-list" id="player-list-ui"></ul>
+        <div style="margin-top: auto; padding-top: 12px;">
+            <button class="btn" id="next-btn" onclick="game.goToDifficulty()" disabled>التالي →</button>
+        </div>
+    </div>
+
+    <!-- DIFFICULTY SCREEN -->
+    <div id="difficulty-screen" class="screen">
+        <p style="margin-bottom: 12px;">اختر نوع الأسئلة</p>
+        <div class="btn-grid">
+            <button class="btn btn-difficulty" style="border-color: var(--success);" onclick="game.startGame('easy')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-linecap="round" stroke-linejoin="round" style="width:28px;height:28px;stroke-width:2.5px;">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                </svg>
+                <div class="btn-difficulty-content">
+                    <span>سهل</span>
+                    <span class="sub">أسئلة عامة</span>
+                </div>
+            </button>
+            <button class="btn btn-difficulty" style="border-color: var(--secondary);" onclick="game.startGame('medium')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--secondary)" stroke-linecap="round" stroke-linejoin="round" style="width:28px;height:28px;stroke-width:2.5px;"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+                <div class="btn-difficulty-content">
+                    <span>متوسط</span>
+                    <span class="sub">معلومات ثقافية</span>
+                </div>
+            </button>
+            <button class="btn btn-difficulty" style="border-color: var(--danger);" onclick="game.startGame('hard')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-linecap="round" stroke-linejoin="round" style="width:28px;height:28px;stroke-width:2.5px;"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.1.2-2.2.6-3.3a1 1 0 0 1 1.9.3z"/></svg>
+                <div class="btn-difficulty-content">
+                    <span>صعب</span>
+                    <span class="sub">تحدي الذكاء</span>
+                </div>
+            </button>
+            <button class="btn btn-difficulty" style="border-color: var(--accent);" onclick="game.startGame('mixed')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-linecap="round" stroke-linejoin="round" style="width:28px;height:28px;stroke-width:2.5px;"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
+                <div class="btn-difficulty-content">
+                    <span>مكس</span>
+                    <span class="sub">عشوائي</span>
+                </div>
+            </button>
+        </div>
+    </div>
+
+    <!-- GAME SCREEN -->
+    <div id="game-screen" class="screen" style="padding: 12px;">
+        <div class="question-card">
+            <svg class="question-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <div id="question-text" class="question-text">جاري التحميل...</div>
+        </div>
+
+        <div class="host-info-card">
+            <div class="host-info-check">
+                <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="host-info-text">
+                <span class="host-info-label">الإجابة الصحيحة</span>
+                <span id="correct-answer-display" class="host-info-answer">...</span>
+            </div>
+        </div>
+
+        <div class="player-grid" id="game-player-grid"></div>
+    </div>
+
+    <!-- WINNER SCREEN -->
+    <div id="winner-screen" class="screen">
+        <div style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; padding: 20px 0;">
+            <div class="mascot">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#2D3436" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:46px;height:46px;"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+            </div>
+            <h2>الفائز هو</h2>
+            <div id="winner-name-display" class="winner-name">اسم اللاعب</div>
+            <div style="font-size:1.3rem; color:var(--text); margin-bottom:2rem; font-weight:600; text-align:center;">
+                جمع <span id="winner-score-display" style="color:var(--success);">10</span> نقطة
+            </div>
+            <div style="width:100%; max-width:280px;">
+                <button class="btn" onclick="game.restartGame()">لعب مرة أخرى</button>
+                <button class="btn btn-secondary" onclick="game.resetAll()">القائمة الرئيسية</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ABOUT SCREEN -->
+    <div id="about-screen" class="screen">
+        <div style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; padding: 10px 0;">
+            <div class="mascot" style="background: var(--secondary);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#2D3436" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:46px;height:46px;"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            </div>
+            <h2 style="color:var(--secondary-dark);">عن المطور</h2>
+            <div class="about-card">
+                <p style="margin-bottom:10px; font-weight:700; font-size:1.1rem; color:var(--text);">"الشخصية الاستثنائية"</p>
+                <p style="margin-bottom:0; font-size:0.9rem; line-height:1.7; text-align:right; color:#444;">
+                    هو شخصية استثنائية بكل المقاييس، حضور يسبق اسمه، وكاريزما تفرض نفسها دون استئذان. وسيم بملامح متقنة، جذاب بطريقة طبيعية لا تُصطنع، وفاتن لكوكب حواء بلا منازع.
+                    <br><br>
+                    يملك حضورًا آسِرًا ونظرة واثقة، وكأن التفاصيل خُلقت لتكتمل به. أناقته ليست مجرد مظهر، بل أسلوب حياة.
+                    <br><br>
+                    هو ذاك الذي يجمع بين الرقي والجاذبية، بين الثبات والمرونة، بين الطموح والهيبة. باختصار: حالة نادرة، ونسخة لا تتكرر.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- EXIT MODAL -->
+    <div class="modal-overlay" id="exit-modal">
+        <div class="modal-card">
+            <div style="margin-bottom:12px; color:var(--danger);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:44px;height:44px;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <h3 style="margin-bottom:8px; font-size:1.3rem;">إنهاء اللعبة؟</h3>
+            <p style="margin-bottom:16px; font-size:0.95rem;">هل أنت متأكد من الخروج؟ سيتم فقدان تقدم الجولة الحالية.</p>
+            <div style="display:flex; gap:10px;">
+                <button class="btn btn-secondary" onclick="ui.closeModal('exit-modal')">إلغاء</button>
+                <button class="btn btn-danger" onclick="game.confirmExit()">خروج</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SETTINGS MODAL -->
+    <div class="modal-overlay" id="settings-modal">
+        <div class="modal-card">
+            <h3 style="margin-bottom:16px; font-size:1.3rem;">الإعدادات</h3>
+            <div class="settings-row">
+                <div class="settings-label">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                    موسيقى
+                </div>
+                <input type="range" id="music-volume" min="0" max="100" value="30" oninput="audioManager.setMusicVolume(this.value)">
+            </div>
+            <div class="settings-row">
+                <div class="settings-label">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                    مؤثرات
+                </div>
+                <input type="range" id="sfx-volume" min="0" max="100" value="50" oninput="audioManager.setSfxVolume(this.value)">
+            </div>
+            <button class="btn btn-secondary" onclick="ui.closeModal('settings-modal')">إغلاق</button>
+        </div>
+    </div>
+
+    <!-- HINT BOTTOM SHEET -->
+    <div class="bottom-sheet-overlay" id="hint-overlay" onclick="ui.closeBottomSheet('hint-sheet')"></div>
+    <div class="bottom-sheet" id="hint-sheet">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <h3 style="font-size:1.2rem; display:flex; align-items:center; gap:8px;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;"><path d="M9 18h6a2 2 0 0 1 2 2v1a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-1a2 2 0 0 1 2-2z"/><path d="M8.5 14c.5-3 2.5-5 3.5-5s3 2 3.5 5"/><path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7z"/></svg>
+                تلميح
+            </h3>
+            <button class="icon-btn" style="width:34px;height:34px;" onclick="ui.closeBottomSheet('hint-sheet')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <div id="hint-content" style="background:#FFF3CD; padding:14px; border-radius:15px; border:2px dashed var(--border-color); color:#856404; font-weight:600; font-size:1rem; line-height:1.6;"></div>
+    </div>
+</div>
+
+<script>
+// ─── PWA INSTALL ───
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    document.getElementById('install-btn').style.display = 'flex';
+});
+
+async function installApp() {
+    if (!deferredPrompt) {
+        ui.showToast('افتح الموقع في المتصفح لتثبيته', 'info');
+        return;
+    }
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+        document.getElementById('install-btn').style.display = 'none';
+    }
+    deferredPrompt = null;
+}
+
+// ─── AUDIO ───
+const audioManager = {
+    ctx: null,
+    musicInterval: null,
+    musicGain: null,
+    sfxGain: null,
+    isMusicPlaying: false,
+    musicVolume: 0.3,
+    sfxVolume: 0.5,
+    noteIndex: 0,
+    melody: [261.63, 329.63, 392.00, 523.25, 392.00, 329.63, 261.63, 196.00],
+
+    init() {
+        if (!this.ctx) {
+            this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+            this.musicGain = this.ctx.createGain();
+            this.musicGain.gain.value = this.musicVolume;
+            this.musicGain.connect(this.ctx.destination);
+            this.sfxGain = this.ctx.createGain();
+            this.sfxGain.gain.value = this.sfxVolume;
+            this.sfxGain.connect(this.ctx.destination);
+        }
+        if (this.ctx.state === 'suspended') this.ctx.resume();
+    },
+
+    setMusicVolume(val) {
+        this.musicVolume = val / 100;
+        if (this.musicGain) this.musicGain.gain.setTargetAtTime(this.musicVolume, this.ctx.currentTime, 0.1);
+    },
+
+    setSfxVolume(val) {
+        this.sfxVolume = val / 100;
+        if (this.sfxGain) this.sfxGain.gain.setTargetAtTime(this.sfxVolume, this.ctx.currentTime, 0.1);
+    },
+
+    playTone(freq, type, duration, gainNode) {
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+        gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(gainNode);
+        osc.start(this.ctx.currentTime);
+        osc.stop(this.ctx.currentTime + duration);
+    },
+
+    playClick() { this.init(); this.playTone(800, 'sine', 0.05, this.sfxGain); },
+    playError() { this.init(); this.playTone(150, 'sawtooth', 0.3, this.sfxGain); },
+    playCorrect() {
+        this.init();
+        this.playTone(600, 'sine', 0.1, this.sfxGain);
+        setTimeout(() => this.playTone(900, 'sine', 0.2, this.sfxGain), 100);
+        setTimeout(() => this.playTone(1200, 'sine', 0.4, this.sfxGain), 200);
+    },
+    playWin() {
+        this.init();
+        [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
+            setTimeout(() => this.playTone(f, 'square', 0.3, this.sfxGain), i * 150);
+        });
+    },
+
+    startMusic() {
+        this.stopMusic();
+        if (!this.ctx) return;
+        this.isMusicPlaying = true;
+        this.noteIndex = 0;
+        const playNext = () => {
+            if (!this.isMusicPlaying) return;
+            this.playTone(this.melody[this.noteIndex % this.melody.length], 'triangle', 0.4, this.musicGain);
+            this.noteIndex++;
+            this.musicInterval = setTimeout(playNext, 400);
+        };
+        playNext();
+    },
+
+    stopMusic() {
+        this.isMusicPlaying = false;
+        if (this.musicInterval) { clearTimeout(this.musicInterval); this.musicInterval = null; }
+    }
+};
+
+// ─── QUESTION BANK ───
+const QuestionBank = [
+    { id: 1, text: "ما هي عاصمة المملكة العربية السعودية؟", answer: "الرياض", hint: "تقع في وسط البلاد وتسمى بمدينة النخيل.", difficulty: "easy" },
+    { id: 2, text: "كم عدد أيام الأسبوع؟", answer: "7 أيام", hint: "عدد أصابع اليد زائد اثنين.", difficulty: "easy" },
+    { id: 3, text: "ما هو الحيوان الذي يلقب بملك الغابة؟", answer: "الأسد", hint: "يملك لبدة حول رقبته وصوت زئير قوي.", difficulty: "easy" },
+    { id: 4, text: "ما هو لون السماء الصافية؟", answer: "الأزرق", hint: "لون البحر أيضاً.", difficulty: "easy" },
+    { id: 5, text: "كم عدد ألوان قوس قزح؟", answer: "7 ألوان", hint: "أحمر، برتقالي، أصفر، أخضر، أزرق، نيلي، بنفسجي.", difficulty: "easy" },
+    { id: 6, text: "ما هي العملة المستخدمة في مصر؟", answer: "الجنيه", hint: "نفس اسم عملة بريطانيا لكن مختلفة.", difficulty: "easy" },
+    { id: 7, text: "من هو خاتم الأنبياء؟", answer: "محمد صلى الله عليه وسلم", hint: "بعث في مكة المكرمة.", difficulty: "easy" },
+    { id: 8, text: "ما هو الشيء الذي كلما زاد نقص؟", answer: "العمر", hint: "الوقت الذي نعيشه.", difficulty: "easy" },
+    { id: 9, text: "أين يقع برج إيفل؟", answer: "باريس", hint: "عاصمة فرنسا.", difficulty: "easy" },
+    { id: 10, text: "ما هو أسرع حيوان بري؟", answer: "الفهد", hint: "يتميز بنقاط سوداء على جسمه.", difficulty: "easy" },
+    { id: 11, text: "في أي عام انتهت الحرب العالمية الثانية؟", answer: "1945", hint: "في منتصف الأربعينيات من القرن العشرين.", difficulty: "medium" },
+    { id: 12, text: "ما هي أكبر قارة في العالم من حيث المساحة؟", answer: "آسيا", hint: "تقع فيها الصين والهند.", difficulty: "medium" },
+    { id: 13, text: "من هو مؤلف علم الجبر؟", answer: "الخوارزمي", hint: "عالم مسلم من بغداد، واسمه مشتق من كلمة Algorithm.", difficulty: "medium" },
+    { id: 14, text: "ما هو العنصر الكيميائي الذي رمزه O؟", answer: "الأكسجين", hint: "نحتاجه للتنفس.", difficulty: "medium" },
+    { id: 15, text: "كم عدد قارات العالم؟", answer: "7 قارات", hint: "آسيا، أفريقيا، أوروبا، أمريكا الشمالية، أمريكا الجنوبية، أستراليا، أنتاركتيكا.", difficulty: "medium" },
+    { id: 16, text: "ما هي الدولة التي تسمى أرض الشمس المشرقة؟", answer: "اليابان", hint: "دولة شرق آسيوية مشهورة بالتكنولوجيا.", difficulty: "medium" },
+    { id: 17, text: "من هو مكتشف الجاذبية؟", answer: "إسحاق نيوتن", hint: "سقطت تفاحة على رأسه.", difficulty: "medium" },
+    { id: 18, text: "ما هي عاصمة إسبانيا؟", answer: "مدريد", hint: "تقع في وسط إسبانيا.", difficulty: "medium" },
+    { id: 19, text: "كم عدد عضلات جسم الإنسان تقريباً؟", answer: "600 عضلة", hint: "رقم كبير يتجاوز النصف ألف.", difficulty: "medium" },
+    { id: 20, text: "ما هو أطول نهر في العالم؟", answer: "نهر النيل", hint: "يمر عبر مصر والسودان.", difficulty: "medium" },
+    { id: 21, text: "في أي عام تأسست جامعة القاهرة؟", answer: "1908", hint: "في أوائل القرن العشرين.", difficulty: "hard" },
+    { id: 22, text: "ما هو اسم أول رائد فضاء عربي؟", answer: "سلطان بن سلمان", hint: "أمير سعودي.", difficulty: "hard" },
+    { id: 23, text: "كم عدد أسنان الإنسان البالغ؟", answer: "32 سنة", hint: "بما في ذلك ضروس العقل الأربعة.", difficulty: "hard" },
+    { id: 24, text: "ما هي عاصمة كازاخستان؟", answer: "أستانا", hint: "تم تغيير اسمها مؤخراً من نور سلطان.", difficulty: "hard" },
+    { id: 25, text: "من هو العالم الذي اخترع المصباح الكهربائي؟", answer: "توماس إديسون", hint: "عالم أمريكي مشهور باختراعاته.", difficulty: "hard" },
+    { id: 26, text: "ما هو المعدن السائل في درجة حرارة الغرفة؟", answer: "الزئبق", hint: "يستخدم في موازين الحرارة القديمة.", difficulty: "hard" },
+    { id: 27, text: "كم عدد سور القرآن الكريم؟", answer: "114 سورة", hint: "آخرها سورة الناس.", difficulty: "hard" },
+    { id: 28, text: "ما هي الدولة التي تقع فيها مدينة البندقية؟", answer: "إيطاليا", hint: "دولة على شكل الحذاء.", difficulty: "hard" },
+    { id: 29, text: "ما هو الكوكب الأقرب للشمس؟", answer: "عطارد", hint: "أصغر كواكب المجموعة الشمسية.", difficulty: "hard" },
+    { id: 30, text: "من هو مؤلف رواية البؤساء؟", answer: "فيكتور هوجو", hint: "كاتب فرنسي شهير.", difficulty: "hard" },
+    { id: 31, text: "ما هي لغة البرمجة الشهيرة التي بدأت باسم 'موكا'؟", answer: "جافا سكربت", hint: "تعمل في المتصفح وعلى الخادم عبر Node.js.", difficulty: "medium" },
+    { id: 32, text: "ما هي أكبر مدينة في العالم من حيث عدد السكان تقريباً؟", answer: "طوكيو", hint: "تقع في اليابان وتضم منطقة العاصمة الكبرى.", difficulty: "hard" },
+    { id: 33, text: "ما هو الغاز الرئيسي في الغلاف الجوي للأرض؟", answer: "النيتروجين", hint: "يشكل حوالي 78% من الهواء.", difficulty: "easy" },
+    { id: 34, text: "من هو مؤسس شركة مايكروسوفت؟", answer: "بيل غيتس", hint: "شاركها مع بول ألين.", difficulty: "easy" },
+    { id: 35, text: "ما اسم أكبر محيط على وجه الأرض؟", answer: "المحيط الهادئ", hint: "يمتد بين آسيا والأمريكتين.", difficulty: "medium" },
+    { id: 36, text: "كم عدد الدقائق في الساعة؟", answer: "60 دقيقة", hint: "ساعة مقسمة إلى 60.", difficulty: "easy" },
+    { id: 37, text: "ما هو الكوكب الأحمر؟", answer: "المريخ", hint: "ثاني أصغر كوكب في النظام الشمسي بعد عطارد.", difficulty: "easy" },
+    { id: 38, text: "من هو الشاعر العربي المعروف بـ'أمير الشعراء'؟", answer: "الشعراوي؟", hint: "أنا لست متأكد؛ ربما تقصد أحمد شوقي.", difficulty: "hard" },
+    { id: 39, text: "ما هو الحيوان البحري الأكبر؟", answer: "الحوت الأزرق", hint: "يعتبر أكبر مخلوق عاش على الأرض.", difficulty: "medium" },
+    { id: 40, text: "ما هو أكبر كوكب في المجموعة الشمسية؟", answer: "المشتري", hint: "له حلقات ضعيفة وعدد كبير من الأقمار.", difficulty: "medium" },
+    { id: 41, text: "كم كيلوغرامًا في طن متري واحد؟", answer: "1000 كيلوجرام", hint: "طن متري = ألف كيلو.", difficulty: "easy" },
+    { id: 42, text: "ما اسم أطول سورٍ في العالم؟", answer: "سور الصين العظيم", hint: "يمتد عبر شمال الصين.", difficulty: "medium" },
+    { id: 43, text: "ما هو رمز العنصر الحديد في الجدول الدوري؟", answer: "Fe", hint: "من اللاتينية Ferrum.", difficulty: "medium" },
+    { id: 44, text: "ما اسم القارة التي تحتوي على أكبر تنوع بيولوجي وغالبًا ما تُربط بالغابات المطيرة؟", answer: "أفريقيا" , hint: "تضم حوض الأمازون؟ أنا لست متأكداً — الأمازون في أمريكا الجنوبية.", difficulty: "hard" },
+    { id: 45, text: "من هو العالم الذي وضع قوانين الحركة الثلاث؟", answer: "إسحاق نيوتن", hint: "له كتاب Principia.", difficulty: "medium" },
+    { id: 46, text: "ما هي أكبر دولة من حيث المساحة بعد روسيا؟", answer: "كندا", hint: "تقع في شمال أمريكا.", difficulty: "medium" },
+    { id: 47, text: "ما هو المركب العضوي الرئيسي في الخشب؟", answer: "السليلوز", hint: "مكون أساسي في جدران الخلايا النباتية.", difficulty: "hard" },
+    { id: 48, text: "ما اسم العملة الرسمية للدولة اليابان؟", answer: "الين", hint: "رمز العملة ¥.", difficulty: "easy" },
+    { id: 49, text: "من هو الشاعر العربي الذي كتب 'يا رب لا تذرني فردا وانت خير الوارثين'؟", answer: "هذه آية قرآنية وليست بيت شعر", hint: "من القرآن الكريم.", difficulty: "medium" },
+    { id: 50, text: "كم عدد أيام السنة الكبيسة؟", answer: "366 يومًا", hint: "يحدث كل أربع سنوات عادة.", difficulty: "easy" },
+    { id: 51, text: "ما هو السرعة التقريبية للضوء في الفراغ بالمتر/ثانية؟", answer: "≈299792458 م/ث", hint: "حوالي 300 مليون متر في الثانية.", difficulty: "hard" },
+    { id: 52, text: "ما اسم أكبر بحيرة عذبة في العالم من حيث المساحة؟", answer: "بحر قزوين (بحيرة/بحر) أو بحيرة سوبيريور؟", hint: "هناك اختلاف؛ قزوين مالحة إلى حد ما — الأفضل: بحيرة سوبيريور ضمن المياه العذبة.", difficulty: "hard" },
+    { id: 53, text: "ما هو أصغر عدد أولي؟", answer: "2", hint: "العدد الزوجي الوحيد الذي هو أولي.", difficulty: "easy" },
+    { id: 54, text: "من هو مؤلف رواية 'مئة عام من العزلة'؟", answer: "غابرييل غارسيا ماركيث", hint: "كاتب كولومبي حائز نوبل الأدب.", difficulty: "medium" },
+    { id: 55, text: "ما هو العضو المسؤول عن ضخ الدم في الجسم؟", answer: "القلب", hint: "عضلة مركزية في الجهاز الدوري.", difficulty: "easy" },
+    { id: 56, text: "ما اسم أكبر صحراء في العالم؟", answer: "الصحراء القطبية الكبرى أو الصحراء الكبرى؟", hint: "إذا قصدنا الصحراء الحارة: الصحراء الكبرى في أفريقيا.", difficulty: "medium" },
+    { id: 57, text: "ما هو الاسم العلمي لعملية تحويل النبات للطاقة الضوئية؟", answer: "التركيب الضوئي", hint: "يستخدم الضوء لصنع السكر من CO2.", difficulty: "medium" },
+    { id: 58, text: "ما هي وحدة قياس التيار الكهربائي؟", answer: "الأمبير", hint: "رمزها A.", difficulty: "easy" },
+    { id: 59, text: "ما اسم أطول جبل فوق سطح البحر؟", answer: "إيفرست", hint: "يقع في سلسلة الهملايا.", difficulty: "medium" },
+    { id: 60, text: "ما هي العاصمة الفعلية للولايات المتحدة الأمريكية؟", answer: "واشنطن العاصمة", hint: "تُعرف بالإنجليزية Washington, D.C.", difficulty: "easy" },
+    { id: 61, text: "ما اسم أكبر قارة من حيث عدد الدول؟", answer: "أفريقيا", hint: "تضم أكثر من 50 دولة.", difficulty: "medium" },
+    { id: 62, text: "ما اسم أكبر دولة عربية من حيث المساحة؟", answer: "الجزائر", hint: "تقع في شمال أفريقيا.", difficulty: "medium" },
+    { id: 63, text: "من هو مخترع الهاتف؟", answer: "ألكسندر غراهام بيل", hint: "حصل على براءة اختراع في القرن التاسع عشر.", difficulty: "medium" },
+    { id: 64, text: "ما هو اسم العضو الذي يستخدمه الإنسان للتحدث؟", answer: "الفم والحنجرة", hint: "الحبال الصوتية في الحنجرة.", difficulty: "easy" },
+    { id: 65, text: "ما اسم الغاز الذي يسبب الاحتباس الحراري بفعالية عالية ويستخدم في ثلاجات قديمة؟", answer: "الفلوروهيدروكربونات (CFCs سابقًا)", hint: "تم الحد منها بسبب استنزاف الأوزون.", difficulty: "hard" },
+    { id: 66, text: "ما هي اللغة الأكثر تحدثًا كلغة أم في العالم؟", answer: "الماندرين (الصينية)", hint: "تنتشر في الصين.", difficulty: "medium" },
+    { id: 67, text: "ما اسم الدولة التي تحكمها حالياً أكبر مملكة في العالم من حيث عدد السكان؟", answer: "المملكة المتحدة؟", hint: "أنا غير متأكد — السؤال غامض.", difficulty: "hard" },
+    { id: 68, text: "ما هو شكل جزيء الماء (H2O) هندسياً؟", answer: "زاوي (شكل مثلثي مائل) أو زاوية ثنائية القطب", hint: "زاوية بين ذرات الهيدروجين ≈104.5°.", difficulty: "hard" },
+    { id: 69, text: "كم عدد ألوان علم الإمارات؟", answer: "4 ألوان", hint: "أحمر، أخضر، أبيض، أسود.", difficulty: "easy" },
+    { id: 70, text: "من هو أول من طبّق الحاسوب الشخصي تجارياً؟", answer: "آبل (ستيف وزنياك وستيف جوبز) مع Apple I/II", hint: "أواخر السبعينات.", difficulty: "hard" },
+    { id: 71, text: "ما هو المصطلح لقياس مقاومة مرور التيار الكهربائي؟", answer: "المقاومة (أوم)", hint: "رمزها Ω.", difficulty: "easy" },
+    { id: 72, text: "ما اسم أول جامعة إسلامية تأسست في العالم؟", answer: "جامعة القرويين", hint: "تقع في فاس بالمغرب.", difficulty: "hard" },
+    { id: 73, text: "ما هو أسرع وسيلة نقل بري تستخدم مخطط سكة؟", answer: "القطار فائق السرعة (مثل الشينكانسن)", hint: "يصل إلى مئات الكيلومترات في الساعة.", difficulty: "medium" },
+    { id: 74, text: "ما اسم المعدل الذي يقيس متوسط التضخم السنوي؟", answer: "معدل التضخم", hint: "يعبر عنه بنسبة مئوية سنوية.", difficulty: "medium" },
+    { id: 75, text: "ما هو العضو في جسم الإنسان الذي يخزن الصفراء؟", answer: "المرارة", hint: "تقع تحت الكبد.", difficulty: "medium" },
+    { id: 76, text: "ما هي وحدة قياس المقاومة الكهربائية؟", answer: "الأوم (Ω)", hint: "قانون أوم V=IR.", difficulty: "easy" },
+    { id: 77, text: "من هو العالم الذي طور نظرية النسبية الخاصة؟", answer: "ألبرت أينشتاين", hint: "نشرها عام 1905.", difficulty: "medium" },
+    { id: 78, text: "ما اسم الشجرة الشهيرة في لبنان التي ذُكرت في شعاره؟", answer: "شجرة الأرز", hint: "رمز لبنان.", difficulty: "easy" },
+    { id: 79, text: "ما هي أصغر وحدات الحياة؟", answer: "الخلية", hint: "جميع الكائنات الحية مكونة من خلايا.", difficulty: "easy" },
+    { id: 80, text: "ما هي لغة التواصل في بروتوكول شبكة الإنترنت لنقل صفحات الويب؟", answer: "HTTP", hint: "النسخة الآمنة HTTPS.", difficulty: "medium" },
+    { id: 81, text: "ما اسم أسرع طائر حي في الانقضاض؟", answer: "الشاهين (الصقر الشاهين)", hint: "يصل سرعته في الانقضاض لمئات الكيلومترات/ساعة.", difficulty: "hard" },
+    { id: 82, text: "ما اسم أول قمر اصطناعي أطلقه الإنسان؟", answer: "سبوتنيك-1", hint: "أطلقته الاتحاد السوفيتي عام 1957.", difficulty: "medium" },
+    { id: 83, text: "ما هي وحدة قياس الطاقة في النظام الدولي؟", answer: "الجول", hint: "رمزها J.", difficulty: "easy" },
+    { id: 84, text: "ما اسم البحر المحاط بالكامل بقارة واحدة (أفريقيا) والمعروف بمياهه الدافئة؟", answer: "البحر الأحمر", hint: "يفصل شبه الجزيرة العربية عن أفريقيا.", difficulty: "medium" },
+    { id: 85, text: "ما هو المركب الذي يعطي النباتات لونها الأخضر؟", answer: "الكلوروفيل", hint: "يمتص الضوء لعملية التمثيل الضوئي.", difficulty: "easy" },
+    { id: 86, text: "من هو الشاعر العربي الذي كتب 'قارئة الفنجان'؟", answer: "نزار قباني (ليس قطعيًا)", hint: "نزار معروف بشعر الحب.", difficulty: "hard" },
+    { id: 87, text: "كم عدد حروف الهجاء العربية؟", answer: "28 حرفًا", hint: "لا تشمل الهمزة كحرف منفصل هنا؟ في العربية تشمل الهمزة ضمن الأحرف.", difficulty: "easy" },
+    { id: 88, text: "ما اسم القوة التي تجذب الأجسام نحو بعضها البعض؟", answer: "الجاذبية", hint: "تجعل الأشياء تسقط نحو الأرض.", difficulty: "easy" },
+    { id: 89, text: "ما هو عدد ألوان علم فرنسا؟", answer: "3 ألوان", hint: "أزرق، أبيض، أحمر.", difficulty: "easy" },
+    { id: 90, text: "ما اسم البرنامج الذي يستخدم لإنشاء صفحات الويب ديناميكيًا على الخادم بلغة PHP مشهورة في الـ CMS؟", answer: "ووردبريس", hint: "نظام إدارة محتوى شهير مبني على PHP.", difficulty: "medium" },
+    { id: 91, text: "ما اسم أكبر دولة في العالم من حيث عدد الجزر؟", answer: "إندونيسيا", hint: "ألف من الجزر، تقع جنوب شرق آسيا.", difficulty: "hard" },
+    { id: 92, text: "ما اسم الكتاب المقدس عند المسلمين؟", answer: "القرآن", hint: "أنزل على محمد صلى الله عليه وسلم.", difficulty: "easy" },
+    { id: 93, text: "ما هي الدولة التي تحتوي على مدينة البتراء الأثرية؟", answer: "الأردن", hint: "موقعها جنوب غرب العاصمة عمّان.", difficulty: "medium" },
+    { id: 94, text: "ما هو اسم السلسلة الجبلية التي تفصل أوروبا عن آسيا جزئيًا؟", answer: "جبال الأورال", hint: "تقع في روسيا.", difficulty: "medium" },
+    { id: 95, text: "ما اسم أكبر هرم في مصر؟", answer: "هرم خوفو", hint: "يقع في الجيزة.", difficulty: "easy" },
+    { id: 96, text: "ما هو المعدل الطبيعي لضغط الدم المقاس بالملم زئبقي (القيمة العليا التقريبية) عند البالغين؟", answer: "≈120/80 مم زئبقي", hint: "القيمة العليا تقريبية.", difficulty: "hard" },
+    { id: 97, text: "ما اسم المعدة لدى الطيور التي تساعد على طحن الطعام؟", answer: "الحوصلة", hint: "تعمل كطاحونة داخلية.", difficulty: "hard" },
+    { id: 98, text: "ما اسم أكبر محيط في العالم؟", answer: "المحيط الهادئ", hint: "سبق ذكره لكنه سؤال مستقل.", difficulty: "easy" },
+    { id: 99, text: "ما اسم أول مَن صعد إلى القمر؟", answer: "نيل آرمسترونغ", hint: "عام 1969 مع بعثة أبولو 11.", difficulty: "easy" },
+    { id: 100, text: "ما اسم الكوكب الذي يمتلك حلقات واضحة؟", answer: "زحل", hint: "له نظام حلقات معروف.", difficulty: "easy" },
+    { id: 101, text: "ما اسم الغاز الذي نتنشّق بكميات صغيرة جدًا والذي له رائحة مميزة ويستخدم في المستشفيات لتخدير بعض المرضى؟", answer: "النينتروز (غاز الضحك)", hint: "يستخدم أحيانًا كمخدر موضعي.", difficulty: "hard" },
+    { id: 102, text: "ما هو الحيوان الوطني لأستراليا؟", answer: "الكنغر (وكوالا أيضاً شعبي)", hint: "رمز أستراليا.", difficulty: "medium" },
+    { id: 103, text: "ما اسم البحر الواقع بين السعودية وإيران؟", answer: "الخليج العربي", hint: "يطلق عليه البعض الخليج الفارسي؛ هذا قد يكون جدليًا.", difficulty: "hard" },
+    { id: 104, text: "ما اسم أسرع حيوان بحري؟", answer: "سمكة الشراع أو الإسقمري الشراعي", hint: "تصل سرعات عالية أثناء السباحة.", difficulty: "hard" },
+    { id: 105, text: "ما اسم العملة في المملكة المتحدة؟", answer: "الجنيه الإسترليني", hint: "رمزها GBP.", difficulty: "easy" },
+    { id: 106, text: "ما هو الرقم اللاصق لقول 'لا شيء يخصك' في الرياضيات: صفر أم واحد؟", answer: "الصفر", hint: "الصفر يمثل لا شيء.", difficulty: "easy" },
+    { id: 107, text: "ما اسم أطول نهر في السعودية؟", answer: "وادي الدواسر/الأودية الموسمية — لا نهر دائم طويل", hint: "المملكة لا تحتوي على أنهار دائمة كبيرة.", difficulty: "hard" },
+    { id: 108, text: "ما اسم أول مكتشف للأمصال أو وحدة لصناعة اللقاحات الحديثة؟", answer: "لويس باستور", hint: "ساهم في علم الجراثيم والتطعيم.", difficulty: "medium" },
+    { id: 109, text: "ما هي صيغة الماء الكيميائية؟", answer: "H2O", hint: "ذرتا هيدروجين وذرة أكسجين.", difficulty: "easy" },
+    { id: 110, text: "ما هو المصطلح الذي يصف انتقال الحرارة عبر الفراغ بواسطة موجات كهرومغناطيسية؟", answer: "الإشعاع الحراري", hint: "الشمس تسخن الأرض عن طريق الإشعاع.", difficulty: "medium" },
+    { id: 111, text: "ما اسم العالم الذي اكتشف البنسلين؟", answer: "ألكسندر فليمنج", hint: "اكتشفه مصادفة في عام 1928.", difficulty: "medium" },
+    { id: 112, text: "ما هي عاصمة تركيا؟", answer: "أنقرة", hint: "ليست اسطنبول.", difficulty: "easy" },
+    { id: 113, text: "ما هو أسرع حيوان بري عندما يركض لمسافات قصيرة؟", answer: "الفهد", hint: "سبق ذكره لكن سؤال مستقل.", difficulty: "easy" },
+    { id: 114, text: "ما اسم المادة التي تستخدم كوقود في محركات الاحتراق الداخلي التقليدية؟", answer: "البنزين أو الديزل", hint: "يعتمد على نوع المحرك.", difficulty: "easy" },
+    { id: 115, text: "ما اسم أصغر قارة من حيث المساحة؟", answer: "أستراليا", hint: "أحيانًا تُحسب أستراليا وأوقيانوسيا معًا.", difficulty: "medium" },
+    { id: 116, text: "ما اسم الدولة التي توجد فيها مدينة كيب تاون الشهيرة؟", answer: "جنوب أفريقيا", hint: "واحدة من ثلاث عواصم فيها.", difficulty: "medium" },
+    { id: 117, text: "ما هو مركب الجلوكوز من حيث الصيغة الكيميائية؟", answer: "C6H12O6", hint: "سكر بسيط أساسي.", difficulty: "hard" },
+    { id: 118, text: "ما اسم القائد الذي قاد حملة الإسكندر الأكبر؟", answer: "الإسكندر المقدوني", hint: "فتح أجزاء واسعة من آسيا.", difficulty: "medium" },
+    { id: 119, text: "ما هي لغة الرسم التخطيطي القياسية لإنشاء واجهات المستخدم في الويب؟", answer: "HTML", hint: "HTML + CSS + JS لبناء صفحات الويب.", difficulty: "easy" },
+    { id: 120, text: "ما اسم المعدن الأكثر وفرة في القشرة الأرضية؟", answer: "الأكسجين (عنصر) ثم السيليكون كمعدن", hint: "الأكسجين عنصر شائع في القشرة، لكن كمعدن: السيليكات.", difficulty: "hard" },
+    { id: 121, text: "ما اسم أول مدينة عربية وصلت إليها الحضارة الإسلامية وانتشرت فيها العلوم؟", answer: "المدن كثيرة — بغداد كانت مركزًا علميًا كبيرًا", hint: "بغداد اشتهرت كمركز علمي في العصر العباسي.", difficulty: "hard" },
+    { id: 122, text: "ما اسم الجهاز الذي يقيس شدة الصوت؟", answer: "مقياس الديسيبل (مقياس صوتي)", hint: "يقاس بالديسيبل dB.", difficulty: "medium" },
+    { id: 123, text: "ما اسم أصغر وحدة في العنصر الكيميائي من حيث التحلل إلى نفس العنصر؟", answer: "الذرة", hint: "الذرة هي وحدة العنصر.", difficulty: "easy" },
+    { id: 124, text: "ما اسم أكبر جزيرة في العالم؟", answer: "جرينلاند", hint: "تتبع ملكيتها للدنمارك.", difficulty: "medium" },
+    { id: 125, text: "ما اسم أهم حاسة لدى السمك للكشف عن الحركات في الماء؟", answer: "النظام الجانبي (lateral line)", hint: "يساعده على الإحساس بالاهتزازات.", difficulty: "hard" },
+    { id: 126, text: "ما هو الرقم الذري لعنصر الكربون؟", answer: "6", hint: "له 6 بروتونات.", difficulty: "medium" },
+    { id: 127, text: "ما هو اسم السرعة التي يتحرك بها الضوء في الفراغ تقريبًا؟", answer: "سرعة الضوء", hint: "≈299,792,458 م/ث.", difficulty: "hard" },
+    { id: 128, text: "ما اسم العملة في الإمارات العربية المتحدة؟", answer: "الدرهم الإماراتي", hint: "رمزها AED.", difficulty: "easy" },
+    { id: 129, text: "ما هي الأداة المستخدمة لقياس درجة الحرارة؟", answer: "محرار/ترمومتر", hint: "يوجد رقمي وزئبقي.", difficulty: "easy" },
+    { id: 130, text: "ما اسم أطول حيوان بري؟", answer: "الزرافة", hint: "طويلة العنق.", difficulty: "easy" },
+    { id: 131, text: "ما اسم العالم الذي أسس علم الوراثة الحديثة من خلال تجاربه على البازلاء؟", answer: "جريجور مندل", hint: "مندل هو والد الوراثة الكلاسيكية.", difficulty: "medium" },
+    { id: 132, text: "ما اسم المركبة التي هبطت أولًا على سطح القمر؟", answer: "مركبة أبولو 11 (الهبوط القمري عبر إيغل)", hint: "هبطت عام 1969.", difficulty: "medium" },
+    { id: 133, text: "ما هي المادة التي تشكل جدران الخلايا النباتية؟", answer: "السليلوز", hint: "مذكور سابقًا لكن سؤال مستقل.", difficulty: "medium" },
+    { id: 134, text: "ما اسم أكبر دولة في آسيا من حيث المساحة؟", answer: "روسيا (جزء منها في آسيا)", hint: "روسيا أكبر دولة في العالم بكاملها.", difficulty: "medium" },
+    { id: 135, text: "ما اسم الكتاب الشهير الذي ألفه هوميروس؟", answer: "الإلياذة والأوديسة", hint: "ملحمة يونانية قديمة.", difficulty: "hard" },
+    { id: 136, text: "ما هو المصطلح لقياس مقاومة السقوط (الاحتكاك الجوي)؟", answer: "قوة السحب (Drag)", hint: "تؤثر على حركة الأجسام في الهواء.", difficulty: "hard" },
+    { id: 137, text: "ما اسم البحيرة المالحة الكبيرة في وسط آسيا؟", answer: "بحر قزوين", hint: "مذكور سابقًا كإشكالية؛ يُعد أكبر مسطح مائي محاط باليابسة.", difficulty: "medium" },
+    { id: 138, text: "ما اسم أصغر وحدة زمنية شائعة الاستخدام في الحسابات اليومية؟", answer: "الثانية", hint: "1/60 من الدقيقة.", difficulty: "easy" },
+    { id: 139, text: "ما اسم العالم الذي برهن أن الأرض تدور حول الشمس؟", answer: "كوبرنيكوس (جورجيو كوبرنيكوس)", hint: "ثورة كوبرنيكوسية في الفلك.", difficulty: "hard" },
+    { id: 140, text: "ما اسم الحيوان الذي يبيض ويولد من الثدييات؟", answer: "المنقاري (خُلد) — المناقير (الخفاش؟) ", hint: "الأسئلة حول الثدييات البياضة قليلة (كالخلد المنقاري والنعام؟) — الخلد المنقاري هو حيوان منقاري البيوض.", difficulty: "hard" },
+    { id: 141, text: "ما اسم أداة تستخدم لقياس الضغط الجوي؟", answer: "البارومتر", hint: "يمكن أن يكون زئبقيًا أو رقميًا.", difficulty: "medium" },
+    { id: 142, text: "ما اسم أهم جهاز في شبكات الحاسوب يقوم بتوجيه الحزم بين الشبكات؟", answer: "الموجّه (Router)", hint: "يوجه حزم IP بين الشبكات.", difficulty: "medium" },
+    { id: 143, text: "ما اسم أطول نهر في آسيا؟", answer: "نهر اليانغتسي أو النهر الأصفر؟", hint: "اليانغتسي أطول.", difficulty: "medium" },
+    { id: 144, text: "ما هو عدد الأجزاء في القرآن الكريم (الأجزاء)؟", answer: "30 جزءًا", hint: "كل جزء مقسّم إلى اثنين وثلاثين حزبًا إجمالًا.", difficulty: "easy" },
+    { id: 145, text: "ما اسم عملة الصين؟", answer: "اليوان (رينمينبي)", hint: "رمزها CNY أو RMB.", difficulty: "easy" },
+    { id: 146, text: "ما هو المصطلح الرياضي لعدد بدون فاصلة عشرية أو كسور؟", answer: "عدد صحيح", hint: "يمكن أن يكون موجبًا أو سالبًا أو صفرًا.", difficulty: "easy" },
+    { id: 147, text: "ما اسم أكبر محمية طبيعية في العالم؟", answer: "متباين حسب التعريف — مثال: محميات بحرية كبيرة", hint: "هناك متغيرات وتعريفات مختلفة.", difficulty: "hard" },
+    { id: 148, text: "ما اسم أشهر لوحة رسمها ليوناردو دا فينشي؟", answer: "الموناليزا", hint: "توجد في متحف اللوفر.", difficulty: "easy" },
+    { id: 149, text: "ما اسم العنصر الذي يستخدم لصنع الأسلاك الكهربائية غالبًا بسبب توصيله العالي؟", answer: "النحاس", hint: "يستخدم أيضًا في الأنابيب والدوائر.", difficulty: "easy" },
+    { id: 150, text: "ما اسم أكبر مدينة في مصر من حيث السكان؟", answer: "القاهرة", hint: "عاصمة مصر.", difficulty: "easy" },
+    { id: 151, text: "ما هو عدد درجات الزاوية في دائرة كاملة؟", answer: "360 درجة", hint: "دائرة = 360°.", difficulty: "easy" },
+    { id: 152, text: "من هو مؤلف رواية 'الأمير'؟", answer: "نيكولو مكيافيلي", hint: "عمل في عصر النهضة الإيطالية.", difficulty: "hard" },
+    { id: 153, text: "ما اسم الأداة التي تقيس سرعة الرياح؟", answer: "الأنويمومتر (مقياس الرياح)", hint: "يُقاس بالكم/ساعة أو م/ث.", difficulty: "medium" },
+    { id: 154, text: "ما اسم العنصر الكيميائي الذي رمزه Na؟", answer: "الصوديوم", hint: "جزء من ملح الطعام NaCl.", difficulty: "medium" },
+    { id: 155, text: "ما هي عاصمة إيطاليا؟", answer: "روما", hint: "مدينة قديمة وعريقة.", difficulty: "easy" },
+    { id: 156, text: "ما اسم الحيوان الذي يطلق عليه لقب 'سفينة الصحراء'؟", answer: "الجمل", hint: "يتحمل الجفاف والمسافات الطويلة.", difficulty: "easy" },
+    { id: 157, text: "ما هو الجهاز الذي يحول الإشارات التناظرية إلى رقمية؟", answer: "محول تناظري إلى رقمي (ADC)", hint: "مهم في الإلكترونيات والقياسات.", difficulty: "hard" },
+    { id: 158, text: "ما اسم مدينة الضباب الشهيرة في أمريكا الشمالية؟", answer: "سان فرانسيسكو", hint: "تقع في ولاية كاليفورنيا.", difficulty: "medium" },
+    { id: 159, text: "ما هي الوحدة المستخدمة لقياس التردد؟", answer: "الهرتز (Hz)", hint: "دورة واحدة في الثانية.", difficulty: "easy" },
+    { id: 160, text: "ما اسم أطول سور في الصين؟", answer: "سور الصين العظيم", hint: "كررنا السؤال لكن هذا نسق آخر.", difficulty: "medium" },
+    { id: 161, text: "ما اسم الكوكب الذي يُسمى بجارة الأرض؟", answer: "الزهرة أو كوكب الزهرة", hint: "أقرب الكواكب إلى الأرض من حيث المسافة يتغير حسب المواقع.", difficulty: "medium" },
+    { id: 162, text: "ما اسم الشاعر الذي لقب بـ'متنبي'؟", answer: "المتنبي", hint: "أحد أشهر شعراء العربية في العصر العباسي.", difficulty: "easy" },
+    { id: 163, text: "ما هي أشهر مادة تستخدم لصنع النوافذ العادية؟", answer: "الزجاج", hint: "شفاف وعازل نسبيًا.", difficulty: "easy" },
+    { id: 164, text: "ما اسم أكبر دولة في أمريكا الجنوبية؟", answer: "البرازيل", hint: "تغطي مساحة كبيرة من القارة.", difficulty: "easy" },
+    { id: 165, text: "ما اسم المضلع الذي له أربعة أضلاع؟", answer: "مربع/مستطيل — مضلع رباعي (رباعي)", hint: "يمكن أن يكون مربعًا أو مستطيلاً أو معينًا.", difficulty: "easy" },
+    { id: 166, text: "ما اسم أقرب نجمة إلى الشمس؟", answer: "قنطور أقرب (بروكسيما قنطورس)", hint: "نجم قريب في نظام ألفا قنطورس.", difficulty: "hard" },
+    { id: 167, text: "ما اسم الجهاز الذي يقيس شدة الضوء؟", answer: "اللوكس ميتر (Lux meter)", hint: "يقيس كمية الإضاءة.", difficulty: "medium" },
+    { id: 168, text: "ما اسم أكبر مدينة في الهند من حيث السكان؟", answer: "مومباي (بومباي سابقًا) أو دلهي حسب التعريف", hint: "المدن الهندية ضخمة وعدد السكان يعتمد على تعريف المدينة الكبرى.", difficulty: "hard" },
+    { id: 169, text: "ما هو المصطلح الذي يصف فقدان الحرارة من جسم إلى محيطه بسبب الحركة؟", answer: "الحمل (Convection)", hint: "نوع من انتقال الحرارة مع حركة.", difficulty: "hard" },
+    { id: 170, text: "ما اسم أول إمبراطور روماني مشهور؟", answer: "أغسطس (أوكتافيان)", hint: "مهد عهد الإمبراطورية الرومانية.", difficulty: "medium" },
+    { id: 171, text: "ما اسم أسرع سمكة معروفة؟", answer: "سمكة الفوهة (سيف بحر؟) أو سمك الشراع", hint: "السرعات تختلف حسب المصدر.", difficulty: "hard" },
+    { id: 172, text: "ما اسم العملة الرسمية في الهند؟", answer: "الروبية الهندية", hint: "رمزها INR.", difficulty: "easy" },
+    { id: 173, text: "ما اسم أقرب قارة إلى القطب الجنوبي؟", answer: "أنتاركتيكا", hint: "هي القطب الجنوبي نفسه.", difficulty: "easy" },
+    { id: 174, text: "ما اسم العالم الذي فسر أن الأمراض قد تنتقل عن طريق الميكروبات؟", answer: "لويس باستور", hint: "ساهم أيضًا في تعليب الطعام والتطعيم.", difficulty: "medium" },
+    { id: 175, text: "ما هو اسم أكبر محيط من حيث العمق المتوسط؟", answer: "المحيط الهادئ", hint: "يحتوي على خندق ماريانا، الأعمق.", difficulty: "hard" },
+    { id: 176, text: "ما هو طيران بدون محرك يسمى؟", answer: "الانزلاق أو الطيران الشراعي (gliding)", hint: "مثل الطائرات الشراعية.", difficulty: "medium" },
+    { id: 177, text: "ما اسم أكبر منطقة حرجة لتنوع الشعاب المرجانية في العالم؟", answer: "الحاجز المرجاني العظيم", hint: "يقع قبالة ساحل كوينزلاند بأستراليا.", difficulty: "medium" },
+    { id: 178, text: "ما اسم وحدة قياس الشحنة الكهربائية؟", answer: "الكولوم (Coulomb)", hint: "1 أمبير × 1 ثانية = 1 كولوم.", difficulty: "hard" },
+    { id: 179, text: "ما اسم أسرع نوع قوارض في العالم؟", answer: "الجرذ؟ (غير واضح)", hint: "هذا سؤال صعب وصيغته قد تحتاج تدقيق.", difficulty: "hard" },
+    { id: 180, text: "ما اسم أشهر معزوفة ('السيمفونية الخامسة') لمؤلف ألماني شهير؟", answer: "لودفيج فان بيتهوفن", hint: "ربما السيمفونية الخامسة لبيتهوفن.", difficulty: "medium" },
+    { id: 181, text: "ما اسم العالم الذي اكتشف أن الدم يدور في الجسم؟", answer: "وليم هارفي", hint: "برهن دارة الدموية في القرن السابع عشر.", difficulty: "hard" },
+    { id: 182, text: "ما هي الدولة الواقعة بين الولايات المتحدة وكندا؟", answer: "كلاهما يحدان بعضهما البعض — لا دولة بينهما", hint: "الحدود البرية بينهما مباشرة.", difficulty: "easy" },
+    { id: 183, text: "ما هي أكبر مدينة في المملكة العربية السعودية من حيث المساحة الحضرية؟", answer: "الرياض", hint: "عاصمة السعودية.", difficulty: "easy" },
+    { id: 184, text: "ما اسم الجهاز الذي يكشف عن وجود المعادن؟", answer: "كاشف المعادن", hint: "يستخدم في الأمن والتنقيب.", difficulty: "easy" },
+    { id: 185, text: "ما اسم أسرع حيوان ثديي بحري؟", answer: "الدلفين القفاز (بعض الأنواع) أو الفقمات السريعة", hint: "المصادر تختلف بحسب النوع.", difficulty: "hard" },
+    { id: 186, text: "ما اسم المادة التي تستخدم في صنع الزجاج غالبًا؟", answer: "رمل السيليكا (ثاني أكسيد السيليكون)", hint: "يسخن ويصهر لصنع الزجاج.", difficulty: "medium" },
+    { id: 187, text: "ما اسم أكبر صقر في العالم؟", answer: "الصقور الكبيرة مثل الصقر الشاهين", hint: "متغير حسب التصنيف.", difficulty: "hard" },
+    { id: 188, text: "ما هو اسم أول محرك بحث شهير على الإنترنت؟", answer: "آرشي (Archie) أو ياهو في مراحل لاحقة", hint: "آرشي كان أول مشروع لفهرسة الملفات.", difficulty: "hard" },
+    { id: 189, text: "ما اسم البركان الشهير الذي ثار في عام 79 م ودمر بومبي؟", answer: "بركان فيزوف (Vesuvius)", hint: "دمر بومبي وهركولانيوم.", difficulty: "medium" },
+    { id: 190, text: "ما اسم أكبر محيط جليدي في القطب الشمالي؟", answer: "المحيط المتجمد الشمالي", hint: "يحيط بالقارة القطبية الشمالية.", difficulty: "medium" },
+    { id: 191, text: "ما اسم الرياضة التي تُلعب بكرة رئيسية وملعقة كبيرة في الملعب؟", answer: "البيسبول أو الكريكيت — السؤال غامض", hint: "البيسبول يستخدم مضرباً وليس ملاعق.", difficulty: "hard" },
+    { id: 192, text: "ما هو تعريف الكتلة في الفيزياء؟", answer: "كمية المادة في الجسم", hint: "ليست الوزن؛ الوزن يتأثر بالجاذبية.", difficulty: "medium" },
+    { id: 193, text: "ما اسم الساحل الشهير الذي يمتد عبر كاليفورنيا ويعرف بمنحدراته ومناظره البحرية؟", answer: "الطريق السريع الساحلي رقم 1 (Pacific Coast Highway)", hint: "يقع بالقرب من سان فرانسيسكو ولوس أنجلوس.", difficulty: "medium" },
+    { id: 194, text: "ما هو اسم أكبر مكتب تسجيل الطوابع البريدية في العالم؟", answer: "غير واضح/لا معرفة محددة", hint: "سؤال نادر وقد يتطلب بحثًا.", difficulty: "hard" },
+    { id: 195, text: "ما اسم القهوة التركية التقليدية التي تُقدّم غالبًا في فنجان صغير؟", answer: "القهوة التركية", hint: "تطحن البن ناعماً وتُغلى.", difficulty: "easy" },
+    { id: 196, text: "ما اسم الجهاز الذي يقيس نسبة الرطوبة في الهواء؟", answer: "الهيغروتر (مقياس الرطوبة)", hint: "يسمى أيضًا رطوبة نسبية.", difficulty: "medium" },
+    { id: 197, text: "ما اسم الجزء من النبات الذي ينتج البذور؟", answer: "الزهرة (ثم الثمرة)", hint: "الزهرة هي الجهاز التناسلي النباتي.", difficulty: "easy" },
+    { id: 198, text: "ما اسم أشهر جبل في اليابان والذي يُعرف بالشكل المخروطي؟", answer: "فوجي (جبل فوجي)", hint: "رمز ثقافي لليابان.", difficulty: "easy" },
+    { id: 199, text: "ما اسم أكبر متحف فني في العالم؟", answer: "متحف اللوفر (باريس)", hint: "يحتوي على آلاف الأعمال الفنية.", difficulty: "medium" },
+    { id: 200, text: "ما هو اسم أغلب المواد البلاستيكية الشائعة المستخدمة في التعبئة؟", answer: "البولي إيثيلين أو PET", hint: "PET شائع في القوارير.", difficulty: "medium" },
+    { id: 201, text: "ما هو عدد كروموسومات الإنسان الطبيعي؟", answer: "46 كروموسومًا", hint: "23 زوجًا.", difficulty: "medium" },
+    { id: 202, text: "ما اسم أطول جسر في العالم؟", answer: "جسر دانيانغ-كونشان الكبير (الصين) بالنسبة للطول الكلي", hint: "يوجد عدة طرق للقياس: أطول جسر بحري هو هونغ كونغ-تشوهاي-ماكاو.", difficulty: "hard" },
+    { id: 203, text: "ما اسم ثاني أكبر قارة من حيث المساحة؟", answer: "أفريقيا أو أمريكا الشمالية؟", hint: "أفريقيا ثالثة حسب البعض؛ آسيا أولى، أفريقيا ثانية أو أمريكا الشمالية تعتمد على التعريف — هذا سؤال معقد.", difficulty: "hard" },
+    { id: 204, text: "ما اسم أول دولة استخدمت العملة الورقية بشكل واسع؟", answer: "الصين في عهد أسرة سونغ", hint: "كانت الورق النقدي من أوائلها.", difficulty: "hard" },
+    { id: 205, text: "ما هو تعريف الكثافة؟", answer: "الكتلة ÷ الحجم", hint: "وحدة الكثافة العامة كغ/م³.", difficulty: "easy" },
+    { id: 206, text: "ما اسم أكبر مدينة في تركيا من حيث السكان؟", answer: "اسطنبول", hint: "ليست العاصمة.", difficulty: "easy" },
+    { id: 207, text: "ما هو اسم العملية التي تتحول فيها الأرض إلى أحافير؟", answer: "التحجر (التحفير)", hint: "تحدث عبر الزمن وإدماج المواد العضوية.", difficulty: "hard" },
+    { id: 208, text: "ما اسم أسرع حيوان بري في الطيران؟", answer: "الطائر الشاهين في الانقضاض (الصقر الشاهين)", hint: "سبق ذكره.", difficulty: "medium" },
+    { id: 209, text: "ما اسم العنصر الذي يستخدم لصنع أسلاك التوصيل الكهربائية بكثرة بعد النحاس؟", answer: "الألومنيوم (في بعض التطبيقات)", hint: "أخف وأرخص في بعض الاستخدامات.", difficulty: "medium" },
+    { id: 210, text: "ما اسم النهر الذي يمر عبر لندن؟", answer: "نهر التيمز", hint: "يمر عبر قلب لندن.", difficulty: "easy" },
+    { id: 211, text: "ما اسم أكبر جزيرة في اليابان؟", answer: "هونشو", hint: "الجزيرة الرئيسية التي تقع عليها طوكيو.", difficulty: "medium" },
+    { id: 212, text: "ما اسم أطول حيوان بحري معظم المصادر تذكره؟", answer: "الحوت الأزرق", hint: "سبق ذكره.", difficulty: "medium" },
+    { id: 213, text: "ما اسم العملية التي يتم فيها فصل مكونات المحلول باستخدام غليان وتكثيف؟", answer: "التقطير", hint: "يستخدم لفصل السوائل ذات نقاط غليان مختلفة.", difficulty: "easy" },
+    { id: 214, text: "ما هو عدد أضلاع السداسي؟", answer: "6 أضلاع", hint: "السداسي = 6.", difficulty: "easy" },
+    { id: 215, text: "ما اسم الدولة التي أسسها مصطفى كمال أتاتورك؟", answer: "تركيا", hint: "تأسست جمهورية تركيا عام 1923.", difficulty: "medium" },
+    { id: 216, text: "ما هو اسم حاسة الشم لدى الإنسان؟", answer: "الشم", hint: "تُجرى عبر الخلايا الشمية في الأنف.", difficulty: "easy" },
+    { id: 217, text: "ما اسم السرعة التي تتجاوز الصوت؟", answer: "فائق الصوت (Supersonic)", hint: "أسرع من ~343 م/ث عند مستوى سطح البحر.", difficulty: "medium" },
+    { id: 218, text: "ما اسم مدينة البندقية بإيطاليا والمعروفة بقنواتها؟", answer: "فينيسيا", hint: "تُسمى البندقية بالعربية.", difficulty: "easy" },
+    { id: 219, text: "ما اسم أطول نهر في أمريكا الجنوبية؟", answer: "نهر الأمازون", hint: "يُعد الأكبر من حيث حجم المياه.", difficulty: "easy" },
+    { id: 220, text: "ما اسم الجهاز الذي يستخدم لقياس سرعة دوران المحرك؟", answer: "التاكوميتر (مقياس عدد الدورات)", hint: "يُقاس بالدورات في الدقيقة RPM.", difficulty: "medium" },
+    { id: 221, text: "ما اسم العاصمة الأسترالية؟", answer: "كانبيرا", hint: "ليست سيدني أو ملبورن.", difficulty: "medium" },
+    { id: 222, text: "ما اسم أسرع حيوان بحري معروف قصير المدى؟", answer: "السمك الشراعي/السيفي (المصادر تختلف)", hint: "سبق ذكره.", difficulty: "hard" },
+    { id: 223, text: "ما هو تعريف السرعة المتجهة في الفيزياء؟", answer: "المقدار والاتجاه معًا", hint: "تختلف عن السرعة القياسية التي ليست متجهة.", difficulty: "medium" },
+    { id: 224, text: "ما اسم العالم المشهور بمساهماته في الكيمياء النووية الذي فاز بنوبل؟", answer: "ماري كوري", hint: "أول شخص يفوز بنوبل في مجالين مختلفين.", difficulty: "hard" },
+    { id: 225, text: "ما اسم المادة التي تعتبر وقودًا أحفوريًا وتستخدم لتوليد الكهرباء عبر الحرق؟", answer: "الفحم", hint: "يُستخدم في محطات الطاقة التقليدية.", difficulty: "easy" },
+    { id: 226, text: "ما اسم أكبر بحيرة عذبة في أفريقيا؟", answer: "بحيرة فكتوريا", hint: "تقع بين أوغندا وتنزانيا وكينيا.", difficulty: "medium" },
+    { id: 227, text: "ما اسم أكبر شبه جزيرة في العالم؟", answer: "شبه الجزيرة العربية", hint: "تقع في جنوب غرب آسيا.", difficulty: "medium" },
+    { id: 228, text: "ما اسم العلم الذي يدرس سلوك البشر والمجتمعات؟", answer: "علم الاجتماع", hint: "يبحث في البنى والعلاقات الاجتماعية.", difficulty: "easy" },
+    { id: 229, text: "ما اسم أسرع حشرة طائرة؟", answer: "ذبابة التسي تسي؟ — مصادر مختلفة", hint: "الأسئلة المتعلقة بسرعة الحشرات قد تكون متغيرة.", difficulty: "hard" },
+    { id: 230, text: "ما اسم الكوكب الذي يمتلك أكبر عدد من الأقمار في المجموعة الشمسية (حتى الآن)؟", answer: "المشتري", hint: "يمتلك العشرات من الأقمار.", difficulty: "medium" },
+    { id: 231, text: "ما اسم الشخصية التاريخية التي قادت حملة صليبية مشهورة وعادت إلى أوروبا محاطة بالأساطير؟", answer: "يوحنا (جان) دارك — فرانسيسكية", hint: "قادت القوات الفرنسية ضد الإنجليز.", difficulty: "hard" },
+    { id: 232, text: "ما اسم أصغر قارة مذكور سابقًا؟", answer: "أستراليا", hint: "القارة القارة الصغيرة.", difficulty: "easy" },
+    { id: 233, text: "ما اسم الجهاز الذي يقيس التيار الكهربائي؟", answer: "الأميتر", hint: "يقاس بالأمبير.", difficulty: "easy" },
+    { id: 234, text: "ما اسم الطبقة الخارجية للأرض؟", answer: "القشرة الأرضية", hint: "تغطيها القارات والمحيطات.", difficulty: "medium" },
+    { id: 235, text: "ما اسم الكيميائي الذي ابتكر الجدول الدوري الحديث؟", answer: "ديمتري مندليف", hint: "رتب العناصر وفقًا لخواصها.", difficulty: "medium" },
+    { id: 236, text: "ما اسم أسرع حيوان بري متوسط الطول في التسلق؟", answer: "القرود السريعة — السؤال غامض", hint: "الأسئلة التصنيفية تحتاج تعريفًا أدق.", difficulty: "hard" },
+    { id: 237, text: "ما اسم المدينة الهندية المقدسة التي تتدفق فيها الأنهار وتعتبر موقعًا لحج كبير؟", answer: "فاراناسي (باناراس)", hint: "تقع على ضفاف نهر الغانج.", difficulty: "medium" },
+    { id: 238, text: "ما اسم الكتاب الذي يحتوي على أعمال شكسبير؟", answer: "المجموعة الكاملة لمسرحيات شكسبير", hint: "أعمال مثل هاملت وماكبث.", difficulty: "hard" },
+    { id: 239, text: "ما اسم أكبر جزيرة في إندونيسيا؟", answer: "كاليمانتان (بورنيو) أو جزيرة سوماترا/جاوة — حسب التعريف", hint: "إندونيسيا تتكون من آلاف الجزر.", difficulty: "hard" },
+    { id: 240, text: "ما اسم أحد رموز الإنترنت التي تبدأ بعنوان URL وتستخدم لنقل صفحات مشفرة؟", answer: "HTTPS", hint: "S تعني Secure.", difficulty: "easy" },
+    { id: 241, text: "ما اسم أول إنسان ذهب إلى الفضاء؟", answer: "يوري جاجارين", hint: "سوفيتي في عام 1961.", difficulty: "medium" },
+    { id: 242, text: "ما اسم أسرع سيارة إنتاجية تقريبًا؟", answer: "يتغير باستمرار — مثال: بوغاتي تشيرون", hint: "المواصفات تتغير بتحديثات المصنعين.", difficulty: "hard" },
+    { id: 243, text: "ما اسم أصغر قارة سكانياً؟", answer: "أستراليا (من حيث عدد السكان المنخفض نسبيًا مقارنة بآسيا)", hint: "أوقيانوسيا أصغر من حيث السكان أيضًا حسب التصنيف.", difficulty: "hard" },
+    { id: 244, text: "ما اسم الجهاز الذي ينقّب في الأرض عن النفط؟", answer: "المثقب أو منصة الحفر", hint: "منصات حفر بحرية وبرية.", difficulty: "medium" },
+    { id: 245, text: "ما اسم العملة في سويسرا؟", answer: "الفرنك السويسري", hint: "رمزها CHF.", difficulty: "easy" },
+    { id: 246, text: "ما اسم أشهر شاعر فارسي قديم؟", answer: "الفردوسي أو حافظ أو سعدي", hint: "الفردوسي مؤلف الشاهنامه.", difficulty: "hard" },
+    { id: 247, text: "ما اسم البروتين الرئيسي في أنسجة الشعر والأظافر؟", answer: "الكيراتين", hint: "بروتين هيكلي.", difficulty: "medium" },
+    { id: 248, text: "ما اسم أسرع طائرة تجريبية عبر التاريخ؟", answer: "يو إف-12/لوكهيد SR-71 بلاك بيرد (للطائرات المأهولة الأسرع)", hint: "تجاوزت 3 ماخ.", difficulty: "hard" },
+    { id: 249, text: "ما اسم المادة التي تُستخدم عادة في صناعة رقائق الكمبيوتر (شرائح السيليكون)؟", answer: "السيليكون", hint: "مادة شبه موصلة.", difficulty: "medium" },
+    { id: 250, text: "ما اسم البحر الذي يفصل بين أوروبا وأفريقيا؟", answer: "بحر المتوسط", hint: "تحيط به دول عديدة في الشمال والجنوب.", difficulty: "easy" },
+    { id: 251, text: "ما اسم العالم الذي اكتشف الإلكترون؟", answer: "جوزيف جون طومسون (J.J. Thomson)", hint: "اكتشف الإلكترون في أواخر القرن التاسع عشر.", difficulty: "hard" },
+    { id: 252, text: "ما اسم جبل يقع على الحدود بين فرنسا وإيطاليا ويشتهر بالتزلج؟", answer: "مون بلان (Mont Blanc)", hint: "أعلى قمة في جبال الألب.", difficulty: "medium" },
+    { id: 253, text: "ما اسم أكبر مدينة في البرازيل من حيث السكان؟", answer: "ساو باولو", hint: "مركز اقتصادي ضخم.", difficulty: "easy" },
+    { id: 254, text: "ما اسم الجهاز الذي يستخدم لقياس عمق الماء؟", answer: "السونار أو عمق الموجة (Depth sounder)", hint: "يستخدم في الملاحة البحرية.", difficulty: "medium" },
+    { id: 255, text: "ما اسم مادة تُستخدم كمغناطيس دائم في الأجهزة الإلكترونية؟", answer: "النيوديميوم (مغناطيس نيوديميوم)", hint: "قوي جدًا ومستخدم في سماعات ومحركات صغيرة.", difficulty: "hard" },
+    { id: 256, text: "ما اسم أكبر مدينة في الصين من حيث المساحة؟", answer: "تشونغتشينغ (حسب تعريف المنطقة الحضرية)", hint: "التصنيفات تختلف بين المدن الصينية.", difficulty: "hard" },
+    { id: 257, text: "ما اسم الجهاز الذي يقيس شدة التيار المتردد والجهد المتردد؟", answer: "المقيس المتعدد (Multimeter)", hint: "يمكنه قياس تيار، جهد، مقاومة.", difficulty: "medium" },
+    { id: 258, text: "ما اسم أشهر لوحة للفنان فان جوخ؟", answer: "ليلة النجوم (Starry Night)", hint: "لوحة شهيرة عن السماء والدوامة.", difficulty: "easy" },
+    { id: 259, text: "ما اسم الملك الذي بنى مدينة الأقصر ومعبد الكرنك في مصر القديمة؟", answer: "الفرعون رمسيس الثاني قد بنى الكثير — لكن بناؤها عبر عدة فراعنة", hint: "الأنشطة المعمارية تمت عبر ملوك متعددين.", difficulty: "hard" },
+    { id: 260, text: "ما اسم الغاز المستخدم لتبريد أنظمة التبريد المحمول؟", answer: "الهواء أو غازات مبردة مثل الفريون سابقًا", hint: "التقنيات الحديثة تستخدم مبردات صديقة للبيئة.", difficulty: "medium" },
+    { id: 261, text: "ما اسم أطول شارع تجاري في العالم؟", answer: "السؤال يعتمد على التعريف — قد يكون شارع يانجون أو غيره", hint: "يتطلب بحثًا دقيقًا.", difficulty: "hard" },
+    { id: 262, text: "ما اسم الأشعة المستخدمة في التصوير الطبي لرؤية العظام؟", answer: "أشعة إكس (X-ray)", hint: "تستخدم لالتقاط صور للعظام والكسور.", difficulty: "easy" },
+    { id: 263, text: "ما اسم الملح التجاري الشائع المكون من الصوديوم والكلور؟", answer: "ملح الطعام (كلوريد الصوديوم NaCl)", hint: "يُستخدم للتتبيل والحفظ.", difficulty: "easy" },
+    { id: 264, text: "ما اسم المدينة الإيطالية المشهورة بجسورها وقنواتها غير البندقية؟", answer: "البندقية هي المدينة الشهيرة بقنواتها", hint: "مذكور سابقًا.", difficulty: "easy" },
+    { id: 265, text: "ما اسم الجهاز الطبي الذي يقيس ضربات القلب عادة؟", answer: "معدل ضربات القلب/مراقب القلب (ECG) أو مقياس النبض", hint: "ECG يسجل النشاط الكهربائي للقلب.", difficulty: "medium" },
+    { id: 266, text: "ما اسم المادة الأساسية في انتاج البلاط الزجاجي؟", answer: "السيليكا (رمل)", hint: "تذوب لتكوين الزجاج.", difficulty: "medium" },
+    { id: 267, text: "ما اسم البحيرة التي تقع على حدود كندا والولايات المتحدة وهي من كبرى البحيرات العظمى؟", answer: "بحيرة سوبيريور", hint: "واحدة من بحيرات العظمى.", difficulty: "medium" },
+    { id: 268, text: "ما هو عدد أعضاء مجلس الأمن الدائمين في الأمم المتحدة؟", answer: "5 أعضاء دائمون", hint: "الولايات المتحدة، المملكة المتحدة، روسيا، الصين، فرنسا.", difficulty: "easy" },
+    { id: 269, text: "ما اسم أول قارب بخاري في التاريخ تقريبًا؟", answer: "قارب روبرت فولتون 'كلارنس' أو اختبارات سابقة — الأمر يعود إلى فولتون كمنفذ تجاري", hint: "التقنية تطورت عبر عدة مخترعين.", difficulty: "hard" },
+    { id: 270, text: "ما اسم أطول سورٍ في جبال الأنديز؟", answer: "لا يوجد 'سور' في الأنديز — هذا سؤال غير صحيح", hint: "قد تكون هناك مخاطر في صياغة السؤال.", difficulty: "hard" },
+    { id: 271, text: "ما اسم الجهاز الذي يقيس ضغط الإطارات في السيارات؟", answer: "مقياس ضغط الإطارات (Tire pressure gauge)", hint: "يقاس بالبار أو PSI.", difficulty: "easy" },
+    { id: 272, text: "ما اسم أشهر كاتب أمريكي مؤلف 'مغامرات هكلبيري فين'؟", answer: "مارك توين", hint: "كاتب أمريكي كلاسيكي.", difficulty: "medium" },
+    { id: 273, text: "ما اسم الغاز الموجود بنسبة كبيرة في البراكين ويعتبر خطيرًا عند تركيز عالٍ؟", answer: "أكسيد الكربون (أحادي أكسيد الكربون) أو ثاني أكسيد الكبريت", hint: "الغازات البركانية متنوعة؛ CO2 وخانق آخر.", difficulty: "hard" },
+    { id: 274, text: "ما اسم أشهر معبد بوذي في اليابان يقع في كيوتو؟", answer: "كينكاكو-جي (الهيكل الذهبي) أو كيوميزو-ديرا", hint: "كلاهما شهيران في كيوتو.", difficulty: "medium" },
+    { id: 275, text: "ما اسم العالم الذي أسهم في تطوير قوانين الجينات المندلية؟", answer: "جريجور مندل", hint: "ذكر سابقًا.", difficulty: "medium" },
+    { id: 276, text: "ما اسم نوع الإشارة اللاسلكية المستخدمة في البلوتوث؟", answer: "تردد عالي الراديو (RF) في نطاق ISM", hint: "نطاق ~2.4 GHz.", difficulty: "hard" },
+    { id: 277, text: "ما اسم البحر الواقع بين إيطاليا واليونان؟", answer: "بحر إيجة أو البحر الأدرياتيكي؟", hint: "البحر الأدرياتيكي بين إيطاليا وهولس; بحر إيجة شرق اليونان.", difficulty: "hard" },
+    { id: 278, text: "ما اسم المركب العضوي الذي يعطي الفلفل الحار طعمه الحار؟", answer: "الكابسايسين", hint: "يتفاعل مع مستقبلات الحرارة في الفم.", difficulty: "medium" },
+    { id: 279, text: "ما اسم الجهاز الذي يحول الطاقة الشمسية إلى كهرباء؟", answer: "اللوحة الشمسية (الخلايا الضوئية)", hint: "تُسمى أيضًا الخلايا الكهروضوئية.", difficulty: "easy" },
+    { id: 280, text: "ما اسم أقصى سرعة صوت في الهواء عند مستوى سطح البحر تقريبًا؟", answer: "≈343 م/ث (عند 20°م)", hint: "تعتمد على درجة الحرارة والضغط.", difficulty: "hard" },
+    { id: 281, text: "ما هو عدد أشهر السنة؟", answer: "12 شهراً", hint: "شهور السنة الاثنا عشرية", difficulty: "easy" },
+    { id: 282, text: "كم عدد أصابع اليد الواحدة؟", answer: "5 أصابع", hint: "عدد الأصابع في اليد", difficulty: "easy" },
+    { id: 283, text: "ما لون ورق الشجر عادةً في الربيع؟", answer: "أخضر", hint: "لون الأوراق الصحية", difficulty: "easy" },
+    { id: 284, text: "ما هي لغة البلدان العربية؟", answer: "العربية", hint: "لغة العرب الرسمية", difficulty: "easy" },
+    { id: 285, text: "ما اسم أكبر كوكب في المجموعة الشمسية؟", answer: "المشتري", hint: "أكبر كواكب المجموعة الشمسية", difficulty: "easy" },
+    { id: 286, text: "ما اسم يوم نهاية الأسبوع في معظم الدول العربية؟", answer: "الجمعة", hint: "يوم الله", difficulty: "easy" },
+    { id: 287, text: "ما هي وحدة قياس الوزن في النظام المتري؟", answer: "الكيلوجرام", hint: "1000 غرام = كيلوجرام", difficulty: "easy" },
+    { id: 288, text: "ما هو لون القمر عند اكتماله أحيانًا عند الغروب؟", answer: "أصفر/برتقالي", hint: "يبدو أصفر عند الأفق", difficulty: "easy" },
+    { id: 289, text: "كم عدد الفصول في السنة؟", answer: "4 فصول", hint: "الربيع، الصيف، الخريف، الشتاء", difficulty: "easy" },
+    { id: 290, text: "ما اسم الشجرة التي تنتج الزيتون؟", answer: "شجرة الزيتون", hint: "رمز مهم في حوض المتوسط", difficulty: "easy" },
+    { id: 291, text: "ما اسم الحيوان الذي يطير ليلًا ويستخدم الصدى؟", answer: "الخفافيش", hint: "مخاطبات صوتية", difficulty: "easy" },
+    { id: 292, text: "ما هو اسم أول شهر في التقويم الميلادي؟", answer: "يناير", hint: "شهر بداية العام الميلادي", difficulty: "easy" },
+    { id: 293, text: "ما اسم الخضار التي تكون عادة حمراء وتُستخدم في السلطة؟", answer: "الطماطم", hint: "تسمى أيضًا البندورة", difficulty: "easy" },
+    { id: 294, text: "ما اسم العملية التي تجعل الماء يغلي؟", answer: "الغليان", hint: "عند 100°م على مستوى سطح البحر", difficulty: "easy" },
+    { id: 295, text: "ما اسم قطعة الأثاث التي ننام عليها؟", answer: "السرير", hint: "ننام ويرتاح الجسم", difficulty: "easy" },
+    { id: 296, text: "ما اسم المادة التي نستخدمها لكتابة على الورق عادة؟", answer: "الحبر/القلم", hint: "قلم حبر أو قلم رصاص", difficulty: "easy" },
+    { id: 297, text: "ما اسم اليوم الذي يلي الاثنين؟", answer: "الثلاثاء", hint: "بعد الاثنين", difficulty: "easy" },
+    { id: 298, text: "ما اسم جهاز نستخدمه لصنع القهوة بسرعة؟", answer: "ماكينة القهوة/غلاية", hint: "تختلف الأنواع", difficulty: "easy" },
+    { id: 299, text: "ما اسم الفاكهة الصفراء الطويلة؟", answer: "الموز", hint: "فاكهة غنية بالبوتاسيوم", difficulty: "easy" },
+    { id: 300, text: "ما هو اسم شكل ثلاثي الأضلاع؟", answer: "مثلث", hint: "يحتوي على ثلاثة أضلاع", difficulty: "easy" },
+    { id: 301, text: "ما اسم لون التفاحة عادةً؟", answer: "أحمر", hint: "فاكهة شائعة", difficulty: "easy" },
+    { id: 302, text: "ما اسم الجهاز الذي نستمع به للموسيقى؟", answer: "مكبر الصوت/السماعات", hint: "يسمع الصوت", difficulty: "easy" },
+    { id: 303, text: "ما اسم المادة التي تُستخدم لصنع الورق غالبًا؟", answer: "الألياف الخشبية", hint: "مصدر السليلوز", difficulty: "easy" },
+    { id: 304, text: "ما اسم الحيوان الذي يُعرف بقدرته على تغيير لونه؟", answer: "حرباء", hint: "يتغير لونه لأسباب تمويهية", difficulty: "easy" },
+    { id: 305, text: "ما اسم القارة التي فيها مصر؟", answer: "أفريقيا", hint: "قارة شمال أفريقيا", difficulty: "easy" },
+    { id: 306, text: "ما اسم الوجبة التي نأكلها صباحًا عادة؟", answer: "الفطور", hint: "وجبة الصباح", difficulty: "easy" },
+    { id: 307, text: "ما اسم السائل الذي نشربه يوميًا بكثرة؟", answer: "الماء", hint: "أساسي للحياة", difficulty: "easy" },
+    { id: 308, text: "ما اسم العدد بين 2 و4؟", answer: "3", hint: "عدد صحيح", difficulty: "easy" },
+    { id: 309, text: "ما اسم الشيء الذي نرتديه على القدم؟", answer: "حذاء", hint: "للوقاية", difficulty: "easy" },
+    { id: 310, text: "ما اسم اللغة الرسمية في فرنسا؟", answer: "الفرنسية", hint: "لغة رومانسية", difficulty: "easy" },
+    { id: 311, text: "ما اسم أداة تقطيع الطعام؟", answer: "سكين", hint: "يستخدم في المطبخ", difficulty: "easy" },
+    { id: 312, text: "ما اسم المركبة التي تسافر في السماء؟", answer: "الطائرة", hint: "وسيلة نقل جوية", difficulty: "easy" },
+    { id: 313, text: "ما اسم الجهاز الذي نستخدمه لإرسال رسائل إلكترونية؟", answer: "الحاسوب/الهاتف", hint: "يوجد تطبيقات", difficulty: "easy" },
+    { id: 314, text: "ما اسم الحيوان الذي يعيش في الماء وله زعانف؟", answer: "السمك", hint: "يعيش في البحار والأنهار", difficulty: "easy" },
+    { id: 315, text: "ما اسم المادة التي تعطينا الطاقة فورًا عند تناولها؟", answer: "السكر", hint: "يعطي طاقة سريعة", difficulty: "easy" },
+    { id: 316, text: "ما اسم الكوكب الذي يدور حول الشمس وهو أقرب إليها؟", answer: "عطارد", hint: "أقرب كوكب", difficulty: "easy" },
+    { id: 317, text: "ما هو اسم الجهاز الذي يعطينا صورة للجسم الداخلي؟", answer: "الأشعة السينية", hint: "للكشف عن الكسور", difficulty: "easy" },
+    { id: 318, text: "ما هو لون قوس قزح الثاني؟", answer: "برتقالي", hint: "بعد الأحمر", difficulty: "easy" },
+    { id: 319, text: "ما اسم الوسيلة التي تستخدم للحساب في البداية؟", answer: "الآلة الحاسبة", hint: "أو باليد", difficulty: "easy" },
+    { id: 320, text: "ما اسم أثمن معدن شائع؟", answer: "الذهب", hint: "يستخدم في الحلي", difficulty: "easy" },
+    { id: 321, text: "ما اسم الطائر الذي لا يطير ويعيش في القارة القطبية؟", answer: "البطريق", hint: "طائر مائي لا يطير", difficulty: "easy" },
+    { id: 322, text: "ما اسم الشراب المصنوع من حبوب محمصة؟", answer: "القهوة", hint: "مشروب مشهور", difficulty: "easy" },
+    { id: 323, text: "ما اسم المدينة التي توجد فيها ساعة بيغ بن؟", answer: "لندن", hint: "عاصمة المملكة المتحدة", difficulty: "easy" },
+    { id: 324, text: "ما اسم الحرف الأول من الأبجدية العربية؟", answer: "ا (ألف)", hint: "أول حرف", difficulty: "easy" },
+    { id: 325, text: "ما اسم الرياضة التي تُلعب بالكرة في ملعب مستطيل ومرمى؟", answer: "كرة القدم", hint: "الأكثر شعبية عالمياً", difficulty: "easy" },
+    { id: 326, text: "ما اسم الحيوان الذي يحمل صغاره في حقيبة؟", answer: "الكنغر", hint: "يحمل الصغار في جراب بطني", difficulty: "easy" },
+    { id: 327, text: "ما اسم الأداة المستخدمة لكتابة على الحاسوب؟", answer: "لوحة المفاتيح", hint: "Keyboard", difficulty: "easy" },
+    { id: 328, text: "ما اسم مادة تشكل جزءًا كبيرًا من الهواء؟", answer: "النيتروجين", hint: "حوالي 78% من الهواء", difficulty: "easy" },
+    { id: 329, text: "ما اسم أكبر قارة من حيث المساحة؟", answer: "آسيا", hint: "تضم الصين والهند", difficulty: "easy" },
+    { id: 330, text: "ما اسم مادة تشكل جدران الخلايا النباتية؟", answer: "السليلوز", hint: "مذكور سابقًا لكن سؤال مستقل", difficulty: "easy" },
+    { id: 331, text: "ما اسم المادة البيضاء التي نأكلها من الحليب؟", answer: "الجبن", hint: "منتجات الألبان", difficulty: "easy" },
+    { id: 332, text: "ما اسم الحيوان الذي يُسمى أفضل صديق للإنسان؟", answer: "الكلب", hint: "حيوان أليف", difficulty: "easy" },
+    { id: 333, text: "ما اسم أول يوم في الأسبوع حسب الترقيم ISO (العمل)؟", answer: "الاثنين", hint: "يبدأ الأسبوع العملي", difficulty: "easy" },
+    { id: 334, text: "ما اسم المتجر الذي نشتري منه الكتب غالبًا؟", answer: "المكتبة", hint: "تحتوي على كتب للشراء أو للإعارة", difficulty: "easy" },
+    { id: 335, text: "ما اسم الجهاز الذي نستخدمه للتنظيف الأرضيات كهربائيا؟", answer: "المكنسة الكهربائية", hint: "تنظف الأتربة", difficulty: "easy" },
+    { id: 336, text: "ما اسم الفاكهة التي تحتوي على الكثير من فيتامين C؟", answer: "البرتقال", hint: "فاكهة حمضية", difficulty: "easy" },
+    { id: 337, text: "ما هو لون النار عادة؟", answer: "أحمر/برتقالي", hint: "يتغير حسب الحرارة", difficulty: "easy" },
+    { id: 338, text: "ما اسم العضو الذي نستخدمه للسمع؟", answer: "الأذن", hint: "الحاسة السمعية", difficulty: "easy" },
+    { id: 339, text: "ما اسم أصغر وحدة قياس للطول في النظام المتري الشائع؟", answer: "المليمتر", hint: "1 سم = 10 ملم", difficulty: "easy" },
+    { id: 340, text: "ما اسم أول بطاقة تعريف شخصية عادةً؟", answer: "بطاقة الهوية", hint: "وثيقة تعريف رسمية", difficulty: "easy" },
+    { id: 341, text: "ما اسم الجهاز الذي نستخدمه لقياس الوقت؟", answer: "الساعة", hint: "تقيس الوقت بالساعات والدقائق", difficulty: "easy" },
+    { id: 342, text: "ما اسم المادة التي تُستخدم لصنع النوافذ عادة؟", answer: "الزجاج", hint: "شفاف وعازل نسبيًا", difficulty: "easy" },
+    { id: 343, text: "ما اسم العملة في السعودية؟", answer: "الريال السعودي", hint: "رمزها SAR", difficulty: "easy" },
+    { id: 344, text: "ما اسم الحرف الأخير في الأبجدية العربية؟", answer: "ياء (ي)", hint: "آخر حروف الأبجدية العربية", difficulty: "easy" },
+    { id: 345, text: "ما اسم أداة القطع المستخدمة في الحديقة لقص النباتات؟", answer: "مقص الحديقة/مقلم", hint: "لتقليم النباتات", difficulty: "easy" },
+    { id: 346, text: "ما اسم اللون الناتج من خلط الأزرق والأصفر؟", answer: "الأخضر", hint: "أحجام الألوان الأساسية", difficulty: "easy" },
+    { id: 347, text: "ما اسم مهنه يقوم بها الطبيب؟", answer: "معالجة المرضى/الطب", hint: "مهنة صحية", difficulty: "easy" },
+    { id: 348, text: "ما اسم الشكل الذي له أربعة أضلاع متساوية وزوايا قائمة؟", answer: "مربع", hint: "كل الأضلاع متساوية", difficulty: "easy" },
+    { id: 349, text: "ما اسم باستعمال الحروف الأولى HTTP ماذا تمثل؟", answer: "بروتوكول نقل النص التشعبي", hint: "بروتوكول للويب", difficulty: "easy" },
+    { id: 350, text: "ما هي وحدة قياس شدة التيار الكهربائي؟", answer: "الأمبير", hint: "رمزها A", difficulty: "easy" },
+    { id: 351, text: "ما اسم المادة التي تستخدم لصنع الأسلاك الكهربائية غالبًا؟", answer: "النحاس", hint: "موصل جيد", difficulty: "easy" },
+    { id: 352, text: "ما اسم أكبر هرم في مصر؟", answer: "هرم خوفو", hint: "يقع في الجيزة", difficulty: "easy" },
+    { id: 353, text: "ما اسم العضو المسؤول عن ضخ الدم؟", answer: "القلب", hint: "عضلة مركزية في الجهاز الدوري", difficulty: "easy" },
+    { id: 354, text: "ما اسم عدد أيام الأسبوع؟", answer: "7 أيام", hint: "أيام الأسبوع السبعة", difficulty: "easy" },
+    { id: 355, text: "ما اسم المادة التي تعطي النباتات لونها الأخضر؟", answer: "الكلوروفيل", hint: "يمتص الضوء لعملية التمثيل الضوئي", difficulty: "easy" },
+    { id: 356, text: "ما اسم الفاكهة الحمراء الصغيرة التي تُستخدم في المربى؟", answer: "الفراولة", hint: "فاكهة شائعة للحلويات", difficulty: "easy" },
+    { id: 357, text: "ما اسم الجهاز الذي يقيس الحرارة؟", answer: "الترمومتر", hint: "يوجد زئبقي ورقمي", difficulty: "easy" },
+    { id: 358, text: "ما اسم العملية البيولوجية التي تصنع النباتات فيها الغذاء؟", answer: "التركيب الضوئي", hint: "باستخدام ضوء الشمس", difficulty: "easy" },
+    { id: 359, text: "ما اسم الشيء الذي نستخدمه لتمزيق الورق؟", answer: "المقص", hint: "أداة الحلاقة للقص", difficulty: "easy" },
+    { id: 360, text: "ما اسم الشكل ذو ثلاثة أضلاع؟", answer: "مثلث", hint: "ثلاثة رؤوس", difficulty: "easy" },
+    { id: 361, text: "ما اسم أكبر محيط في العالم؟", answer: "المحيط الهادئ", hint: "يمتد بين آسيا والأمريكتين", difficulty: "medium" },
+    { id: 362, text: "ما هو عدد دقائق الساعة؟", answer: "60 دقيقة", hint: "ساعة = 60 دقيقة", difficulty: "medium" },
+    { id: 363, text: "ما اسم الغاز الذي نحتاجه للتنفس؟", answer: "الأكسجين", hint: "نحتاجه للكائن الحي", difficulty: "medium" },
+    { id: 364, text: "ما اسم المدينة التي تعرف بمدينة الأضواء؟", answer: "باريس", hint: "عاصمة فرنسا", difficulty: "medium" },
+    { id: 365, text: "ما اسم أكبر صحراء حارة في العالم؟", answer: "الصحراء الكبرى", hint: "تقع في شمال أفريقيا", difficulty: "medium" },
+    { id: 366, text: "ما اسم القارة التي تحتوي على البرازيل؟", answer: "أمريكا الجنوبية", hint: "قارة غنية بالغابات", difficulty: "medium" },
+    { id: 367, text: "ما اسم الكوكب الذي يُعرف بالكوكب الأحمر؟", answer: "المريخ", hint: "لونه أحمر", difficulty: "medium" },
+    { id: 368, text: "ما هو اسم العملية التي تحول الغذاء إلى طاقة داخل الخلايا؟", answer: "التنفس الخلوي", hint: "يحدث داخل الميتوكوندريا", difficulty: "medium" },
+    { id: 369, text: "ما اسم العالم الذي وضع قوانين الحركة؟", answer: "نيوتن", hint: "قوانين الحركة الثلاث", difficulty: "medium" },
+    { id: 370, text: "ما اسم الجهاز الذي يقيس ضغط الدم؟", answer: "جهاز قياس الضغط", hint: "يستخدم لقياس ضغط الشرايين", difficulty: "medium" },
+    { id: 371, text: "ما اسم نسبة الماء في جسم الإنسان تقريبًا؟", answer: "حوالي 60%", hint: "تختلف حسب العمر", difficulty: "medium" },
+    { id: 372, text: "ما اسم العنصر الذي رمزه H؟", answer: "الهيدروجين", hint: "أبسط عنصر", difficulty: "medium" },
+    { id: 373, text: "ما اسم الوحدة القياسية للطاقة؟", answer: "الجول", hint: "رمزها J", difficulty: "medium" },
+    { id: 374, text: "ما اسم الدولة التي لها أكبر عدد من السكان؟", answer: "الصين", hint: "تليها الهند", difficulty: "medium" },
+    { id: 375, text: "ما اسم أول متصفح شهير مفتوح المصدر؟", answer: "موزيلا فايرفوكس", hint: "متصفح من التسعينات والمتأخر", difficulty: "medium" },
+    { id: 376, text: "ما معنى كلمة CPU في الحاسوب؟", answer: "وحدة المعالجة المركزية", hint: "المعالج", difficulty: "medium" },
+    { id: 377, text: "ما اسم أطول برج في العالم؟", answer: "برج خليفة", hint: "يقع في دبي", difficulty: "medium" },
+    { id: 378, text: "ما اسم أطول نهر في العالم من حيث الطول؟", answer: "نهر النيل", hint: "يمر عبر مصر والسودان", difficulty: "medium" },
+    { id: 379, text: "من اكتشف قانون الجاذبية؟", answer: "إسحاق نيوتن", hint: "قال إنه رأى تفاحة تسقط", difficulty: "medium" },
+    { id: 380, text: "من هو مخترع الهاتف؟", answer: "ألكسندر غراهام بيل", hint: "براءة اختراع في القرن التاسع عشر", difficulty: "medium" },
+    { id: 381, text: "ما هي عاصمة الهند؟", answer: "نيودلهي", hint: "عاصمة الهند", difficulty: "medium" },
+    { id: 382, text: "ما هي عاصمة الصين؟", answer: "بكين", hint: "عاصمة الصين", difficulty: "medium" },
+    { id: 383, text: "ما هي عاصمة روسيا؟", answer: "موسكو", hint: "عاصمة روسيا", difficulty: "medium" },
+    { id: 384, text: "ما هي أسرع وسيلة نقل عامة على الأرض؟", answer: "القطار فائق السرعة", hint: "تختلف باختلاف البلد", difficulty: "medium" },
+    { id: 385, text: "ما هو الغاز الذي يشكل معظم الغلاف الجوي؟", answer: "النيتروجين", hint: "حوالي 78%", difficulty: "medium" },
+    { id: 386, text: "ما هي عاصمة إيران؟", answer: "طهران", hint: "عاصمة إيران", difficulty: "medium" },
+    { id: 387, text: "ما هي عاصمة العراق؟", answer: "بغداد", hint: "عاصمة العراق", difficulty: "medium" },
+    { id: 388, text: "ما اسم أكبر بحيرة في أفريقيا؟", answer: "بحيرة فيكتوريا", hint: "بين أوغندا وتنزانيا وكينيا", difficulty: "medium" },
+    { id: 389, text: "ما اسم أكبر بحيرة في العالم من حيث المساحة العذبة؟", answer: "بحيرة سوبيريور", hint: "واحدة من البحيرات العظمى", difficulty: "medium" },
+    { id: 390, text: "ما هي عاصمة اليابان؟", answer: "طوكيو", hint: "مدينة كبرى", difficulty: "medium" },
+    { id: 391, text: "من هو مخترع المصباح الكهربائي المشهور؟", answer: "توماس إديسون", hint: "اشتهر بتطوير المصباح", difficulty: "medium" },
+    { id: 392, text: "ما هو المعدل الطبيعي التقريبي لضغط الدم عند البالغين؟", answer: "≈120/80 مم زئبق", hint: "قيمة تقريبية", difficulty: "medium" },
+    { id: 393, text: "ما هو أطول جسر بحري معروف؟", answer: "جسر هونغ كونغ-تشوهاي-ماكاو (أمثلة متنوعة)", hint: "عدة طرق للقياس", difficulty: "medium" },
+    { id: 394, text: "ما معنى HTTP في الويب؟", answer: "بروتوكول نقل النص التشعبي", hint: "بروتوكول للويب", difficulty: "medium" },
+    { id: 395, text: "ما اسم أطول نهر في آسيا؟", answer: "نهر اليانغتسي", hint: "أطول نهر آسيوي", difficulty: "medium" },
+    { id: 396, text: "ما هو معنى API في البرمجة؟", answer: "واجهة برمجة التطبيقات", hint: "وسيلة للتواصل بين برمجيات", difficulty: "medium" },
+    { id: 397, text: "ما هي عاصمة البرازيل؟", answer: "برازيليا", hint: "مصممة حديثًا كعاصمة", difficulty: "medium" },
+    { id: 398, text: "ما اسم أقرب نجم إلى الشمس؟", answer: "بروكسيما قنطورس", hint: "جزء من نظام ألفا قنطورس", difficulty: "medium" },
+    { id: 399, text: "ما هي وحدة قياس الطاقة الكهربائية؟", answer: "الواط (W)", hint: "قدرة كهربائية", difficulty: "medium" },
+    { id: 400, text: "ما معنى GPS؟", answer: "نظام تحديد المواقع العالمي", hint: "يستخدم الأقمار الصناعية", difficulty: "medium" },
+    { id: 401, text: "من هو مؤسس شركة تسلا (شخصية معروفة)؟", answer: "إيلون ماسك (مشارك)", hint: "مساهم رئيسي", difficulty: "medium" },
+    { id: 402, text: "ما هو المصطلح لقياس المسافة الكبيرة في الفضاء؟", answer: "السنة الضوئية/الفرسخ الفلكي", hint: "السنة الضوئية شائعة", difficulty: "medium" },
+    { id: 403, text: "ما هو تعريف الكتلة في الفيزياء؟", answer: "كمية المادة في الجسم", hint: "تختلف عن الوزن", difficulty: "medium" },
+    { id: 404, text: "ما هو تعريف السرعة؟", answer: "التغير في المسافة بالنسبة للزمن", hint: "يتضمن مقدارًا", difficulty: "medium" },
+    { id: 405, text: "ما اسم أول قمر اصطناعي أطلقه الإنسان؟", answer: "سبوتنيك-1", hint: "أطلقته الاتحاد السوفيتي عام 1957", difficulty: "medium" },
+    { id: 406, text: "ما هي عاصمة ألمانيا؟", answer: "برلين", hint: "عاصمة ألمانيا", difficulty: "medium" },
+    { id: 407, text: "ما هي عاصمة إسبانيا؟", answer: "مدريد", hint: "عاصمة إسبانيا", difficulty: "medium" },
+    { id: 408, text: "ما هي عاصمة البرتغال؟", answer: "لشبونة", hint: "عاصمة البرتغال", difficulty: "medium" },
+    { id: 409, text: "ما اسم أطول نهر في العالم من حيث الطول؟", answer: "نهر النيل", hint: "يمر عبر مصر والسودان", difficulty: "medium" },
+    { id: 410, text: "ما هي عاصمة كندا؟", answer: "أوتاوا", hint: "عاصمة كندا", difficulty: "medium" },
+    { id: 411, text: "ما هي عاصمة أستراليا؟", answer: "كانبيرا", hint: "ليست سيدني", difficulty: "medium" },
+    { id: 412, text: "ما هي وحدة قياس شدة التيار الكهربائي؟", answer: "الأمبير", hint: "رمزها A", difficulty: "medium" },
+    { id: 413, text: "ما هو عدد الكواكب في المجموعة الشمسية؟", answer: "8 كواكب", hint: "بعد إعادة تصنيف بلوتو", difficulty: "medium" },
+    { id: 414, text: "من اكتشف قانون الجاذبية؟", answer: "إسحاق نيوتن", hint: "قوانين الحركة والجاذبية", difficulty: "medium" },
+    { id: 415, text: "ما هو تعريف الضغط الجوي؟", answer: "قوة الهواء على وحدة المساحة", hint: "يُقاس بالبار أو باسكال", difficulty: "medium" },
+    { id: 416, text: "ما اسم الجهاز الذي يحول التيار المتردد إلى تيار مستمر؟", answer: "المقوم (Rectifier)", hint: "يستخدم في الإلكترونيات", difficulty: "medium" },
+    { id: 417, text: "ما اسم العملية التي تستخدم لتحويل الماء إلى بخار؟", answer: "التبخر", hint: "جزء من دورة المياه", difficulty: "medium" },
+    { id: 418, text: "ما هو اسم العنصر الذي يرمز له بالرمز Fe؟", answer: "الحديد", hint: "من اللاتينية Ferrum", difficulty: "medium" },
+    { id: 419, text: "ما هو معنى HTML؟", answer: "لغة توصيف النص الفائق", hint: "تستخدم لبناء صفحات الويب", difficulty: "medium" },
+    { id: 420, text: "ما اسم أكبر بحار العالم من حيث المساحة؟", answer: "المحيط الهادئ", hint: "يغطي مساحة شاسعة", difficulty: "medium" },
+    { id: 421, text: "ما اسم الجهاز الذي يستخدم لقياس التيار الكهربائي؟", answer: "الأميتر", hint: "يقاس بالأمبير", difficulty: "medium" },
+    { id: 422, text: "ما هي عاصمة اليابان؟", answer: "طوكيو", hint: "مدينة كبرى", difficulty: "medium" },
+    { id: 423, text: "ما اسم أكبر مدينة في البرازيل من حيث السكان؟", answer: "ساو باولو", hint: "مركز اقتصادي ضخم", difficulty: "medium" },
+    { id: 424, text: "ما هو تعريف الذكاء الاصطناعي؟", answer: "محاكاة الذكاء البشري بواسطة الآلات", hint: "مجال في علوم الحاسوب", difficulty: "medium" },
+    { id: 425, text: "ما هو اسم أقرب نجم إلى الشمس؟", answer: "بروكسيما قنطورس", hint: "نجم قريب في نظام ألفا قنطورس", difficulty: "medium" },
+    { id: 426, text: "ما هو اسم النظام الذي يستخدم في تحديد المواقع؟", answer: "GPS", hint: "نظام تحديد المواقع العالمي", difficulty: "medium" },
+    { id: 427, text: "ما اسم العضو الذي ينتج الأنسولين؟", answer: "البنكرياس", hint: "ينظم السكر في الدم", difficulty: "medium" },
+    { id: 428, text: "ما اسم المكون الأساسي لصنع الزجاج؟", answer: "رمل السيليكا", hint: "ثاني أكسيد السيليكون", difficulty: "medium" },
+    { id: 429, text: "ما اسم العملة في اليابان؟", answer: "الين", hint: "رمز ¥", difficulty: "medium" },
+    { id: 430, text: "ما اسم أكبر جزيرة في العالم؟", answer: "جرينلاند", hint: "تتبع ملكيتها للدنمارك", difficulty: "medium" },
+    { id: 431, text: "ما اسم العملية التي يُسخن فيها السائل ليفصل مكوناته؟", answer: "التقطير", hint: "لفصل السوائل ذات نقاط غليان مختلفة", difficulty: "medium" },
+    { id: 432, text: "ما هو تعريف الكثافة؟", answer: "الكتلة ÷ الحجم", hint: "وحدة كغ/م³ غالبًا", difficulty: "medium" },
+    { id: 433, text: "من هو مؤسس شركة مايكروسوفت؟", answer: "بيل غيتس", hint: "شاركها مع بول ألين", difficulty: "medium" },
+    { id: 434, text: "ما اسم أكبر مدينة في الهند من حيث السكان؟", answer: "مومباي", hint: "تعتمد الإحصاءات على تعريف المنطقة", difficulty: "medium" },
+    { id: 435, text: "ما هو اسم العالم الذي اكتشف البنسلين؟", answer: "ألكسندر فليمنج", hint: "اكتشفه مصادفة", difficulty: "medium" },
+    { id: 436, text: "ما هي عاصمة النمسا؟", answer: "فيينا", hint: "عاصمة النمسا", difficulty: "medium" },
+    { id: 437, text: "ما هي عاصمة بلجيكا؟", answer: "بروكسل", hint: "عاصمة بلجيكا", difficulty: "medium" },
+    { id: 438, text: "ما هي عاصمة سويسرا؟", answer: "برن", hint: "عاصمة سويسرا", difficulty: "medium" },
+    { id: 439, text: "ما هي عاصمة هولندا؟", answer: "أمستردام", hint: "عاصمة هولندا", difficulty: "medium" },
+    { id: 440, text: "ما هي عاصمة السويد؟", answer: "ستوكهولم", hint: "عاصمة السويد", difficulty: "medium" },
+    { id: 441, text: "ما هي عاصمة النرويج؟", answer: "أوسلو", hint: "عاصمة النرويج", difficulty: "medium" },
+    { id: 442, text: "ما هي عاصمة فنلندا؟", answer: "هلسنكي", hint: "عاصمة فنلندا", difficulty: "medium" },
+    { id: 443, text: "ما هي عاصمة الدانمارك؟", answer: "كوبنهاغن", hint: "عاصمة الدانمارك", difficulty: "medium" },
+    { id: 444, text: "ما هي عاصمة بولندا؟", answer: "وارسو", hint: "عاصمة بولندا", difficulty: "medium" },
+    { id: 445, text: "ما هي عاصمة اليونان؟", answer: "أثينا", hint: "عاصمة اليونان", difficulty: "medium" },
+    { id: 446, text: "ما هي عاصمة المجر؟", answer: "بودابست", hint: "عاصمة المجر", difficulty: "medium" },
+    { id: 447, text: "ما هي عاصمة التشيك؟", answer: "براغ", hint: "عاصمة التشيك", difficulty: "medium" },
+    { id: 448, text: "ما هي عاصمة سلوفاكيا؟", answer: "براتيسلافا", hint: "عاصمة سلوفاكيا", difficulty: "medium" },
+    { id: 449, text: "ما هي عاصمة رومانيا؟", answer: "بوخارست", hint: "عاصمة رومانيا", difficulty: "medium" },
+    { id: 450, text: "ما هي عاصمة بلغاريا؟", answer: "صوفيا", hint: "عاصمة بلغاريا", difficulty: "medium" },
+    { id: 451, text: "ما هي عاصمة كرواتيا؟", answer: "زغرب", hint: "عاصمة كرواتيا", difficulty: "medium" },
+    { id: 452, text: "ما هي عاصمة صربيا؟", answer: "بلغراد", hint: "عاصمة صربيا", difficulty: "medium" },
+    { id: 453, text: "ما هي عاصمة سلوفينيا؟", answer: "ليوبليانا", hint: "عاصمة سلوفينيا", difficulty: "medium" },
+    { id: 454, text: "ما هي عاصمة أيرلندا؟", answer: "دبلن", hint: "عاصمة أيرلندا", difficulty: "medium" },
+    { id: 455, text: "ما هي عاصمة إسرائيل؟", answer: "القدس", hint: "موقف سياسي متباين دوليًا", difficulty: "medium" },
+    { id: 456, text: "ما هي عاصمة لبنان؟", answer: "بيروت", hint: "عاصمة لبنان", difficulty: "medium" },
+    { id: 457, text: "ما هي عاصمة الأردن؟", answer: "عمان", hint: "عاصمة الأردن", difficulty: "medium" },
+    { id: 458, text: "ما هي عاصمة سوريا؟", answer: "دمشق", hint: "عاصمة سوريا", difficulty: "medium" },
+    { id: 459, text: "ما هي عاصمة المغرب؟", answer: "الرباط", hint: "عاصمة المغرب", difficulty: "medium" },
+    { id: 460, text: "ما هي عاصمة الجزائر؟", answer: "الجزائر", hint: "عاصمة الجزائر", difficulty: "medium" },
+    { id: 461, text: "ما هي عاصمة تونس؟", answer: "تونس", hint: "عاصمة تونس", difficulty: "medium" },
+    { id: 462, text: "ما هي عاصمة ليبيا؟", answer: "طرابلس", hint: "عاصمة ليبيا", difficulty: "medium" },
+    { id: 463, text: "ما هي عاصمة السودان؟", answer: "الخرطوم", hint: "عاصمة السودان", difficulty: "medium" },
+    { id: 464, text: "ما هي عاصمة إثيوبيا؟", answer: "أديس أبابا", hint: "عاصمة إثيوبيا", difficulty: "medium" },
+    { id: 465, text: "ما هي عاصمة كينيا؟", answer: "نيروبي", hint: "عاصمة كينيا", difficulty: "medium" },
+    { id: 466, text: "ما هي عاصمة أوغندا؟", answer: "كامبالا", hint: "عاصمة أوغندا", difficulty: "medium" },
+    { id: 467, text: "ما هي عاصمة تنزانيا؟", answer: "دودوما", hint: "العاصمة الرسمية", difficulty: "medium" },
+    { id: 468, text: "ما هي عاصمة النيبال؟", answer: "كاتماندو", hint: "عاصمة نيبال", difficulty: "medium" },
+    { id: 469, text: "ما هي عاصمة باكستان؟", answer: "إسلام آباد", hint: "عاصمة باكستان", difficulty: "medium" },
+    { id: 470, text: "ما هي عاصمة بنغلاديش؟", answer: "داكا", hint: "عاصمة بنغلاديش", difficulty: "medium" },
+    { id: 471, text: "ما هي عاصمة فيتنام؟", answer: "هانوي", hint: "عاصمة فيتنام", difficulty: "medium" },
+    { id: 472, text: "ما هي عاصمة تايلاند؟", answer: "بانكوك", hint: "عاصمة تايلاند", difficulty: "medium" },
+    { id: 473, text: "ما هي عاصمة الفلبين؟", answer: "مانيلا", hint: "عاصمة الفلبين", difficulty: "medium" },
+    { id: 474, text: "ما هي عاصمة كوريا الجنوبية؟", answer: "سيول", hint: "عاصمة كوريا الجنوبية", difficulty: "medium" },
+    { id: 475, text: "ما هي عاصمة كوريا الشمالية؟", answer: "بيونغ يانغ", hint: "عاصمة كوريا الشمالية", difficulty: "medium" },
+    { id: 476, text: "ما هي عاصمة ماليزيا؟", answer: "كوالالمبور", hint: "عاصمة ماليزيا", difficulty: "medium" },
+    { id: 477, text: "ما هي عاصمة إندونيسيا؟", answer: "جاكرتا", hint: "عاصمة إندونيسيا", difficulty: "medium" },
+    { id: 478, text: "ما هي عاصمة سنغافورة؟", answer: "سنغافورة", hint: "مدينة ودولة", difficulty: "medium" },
+    { id: 479, text: "ما هي عاصمة المكسيك؟", answer: "مكسيكو سيتي", hint: "عاصمة المكسيك", difficulty: "medium" },
+    { id: 480, text: "ما هي عاصمة الأرجنتين؟", answer: "بوينس آيرس", hint: "عاصمة الأرجنتين", difficulty: "medium" },
+    { id: 481, text: "ما هي عاصمة تشيلي؟", answer: "سانتياغو", hint: "عاصمة تشيلي", difficulty: "medium" },
+    { id: 482, text: "ما هي عاصمة بيرو؟", answer: "ليما", hint: "عاصمة بيرو", difficulty: "medium" },
+    { id: 483, text: "ما هي عاصمة كولومبيا؟", answer: "بوغوتا", hint: "عاصمة كولومبيا", difficulty: "medium" },
+    { id: 484, text: "ما هي عاصمة فنزويلا؟", answer: "كاراكاس", hint: "عاصمة فنزويلا", difficulty: "medium" },
+    { id: 485, text: "ما هي عاصمة أوروجواي؟", answer: "مونتيفيديو", hint: "عاصمة أوروجواي", difficulty: "medium" },
+    { id: 486, text: "ما هي عاصمة باراغواي؟", answer: "أسونسيون", hint: "عاصمة باراغواي", difficulty: "medium" },
+    { id: 487, text: "ما هو تعريف الكتلة في الفيزياء؟", answer: "كمية المادة في الجسم", hint: "ليست الوزن", difficulty: "medium" },
+    { id: 488, text: "من هو مخترع الهاتف؟", answer: "ألكسندر غراهام بيل", hint: "مخترع القرن التاسع عشر", difficulty: "medium" },
+    { id: 489, text: "ما هو تعريف الضغط الجوي؟", answer: "قوة الهواء على وحدة المساحة", hint: "يُقاس بالباسكال/البار", difficulty: "medium" },
+    { id: 490, text: "ما هو اسم البروتين الذي يحمل الأكسجين في الدم؟", answer: "الهيموغلوبين", hint: "يوجد في خلايا الدم الحمراء", difficulty: "medium" },
+    { id: 491, text: "ما هو تعريف السرعة المتجهة؟", answer: "السرعة مع اتجاهها", hint: "مقدار واتجاه", difficulty: "medium" },
+    { id: 492, text: "ما معنى URL؟", answer: "محدد موقع الموارد", hint: "عنوان صفحة ويب", difficulty: "medium" },
+    { id: 493, text: "ما اسم المرض الذي يسببه فيروس نقص المناعة؟", answer: "الإيدز", hint: "يهاجم جهاز المناعة", difficulty: "medium" },
+    { id: 494, text: "ما اسم أكبر حيوان لاحم بحري؟", answer: "حوت قاتل (أوركا) أو حيتان كبيرة", hint: "يتنوع حسب التصنيف", difficulty: "medium" },
+    { id: 495, text: "ما معنى API؟", answer: "واجهة برمجة التطبيقات", hint: "تُسهّل تواصل البرمجيات", difficulty: "medium" },
+    { id: 496, text: "ما اسم الجهاز الذي يقيس الرطوبة؟", answer: "هيغروتر/مقياس الرطوبة", hint: "يطلق عليه أيضاً Hygrometer", difficulty: "medium" },
+    { id: 497, text: "ما اسم العملية التي تحول النفايات إلى سماد؟", answer: "التسميد (Composting)", hint: "تحويل المواد العضوية إلى سماد", difficulty: "medium" },
+    { id: 498, text: "ما اسم الغابة المطيرة الكبيرة في أمريكا الجنوبية؟", answer: "الأمازون", hint: "أكبر غابة مطيرة في العالم", difficulty: "medium" },
+    { id: 499, text: "ما معنى GPS؟", answer: "نظام تحديد المواقع العالمي", hint: "يعمل بالأقمار الصناعية", difficulty: "medium" },
+    { id: 500, text: "ما اسم أول قمر اصطناعي؟", answer: "سبوتنيك-1", hint: "أطلقته الاتحاد السوفيتي عام 1957", difficulty: "medium" },
+    { id: 501, text: "ما هي عاصمة الولايات المتحدة الأمريكية؟", answer: "واشنطن العاصمة", hint: "عاصمة الولايات المتحدة", difficulty: "medium" },
+    { id: 502, text: "ما هو اسم أول من صاغ قانون أوم؟", answer: "جورج سيمون أوم", hint: "قانون في الكهرباء", difficulty: "medium" },
+    { id: 503, text: "ما هو تعريف الضغط الجوي؟", answer: "قوة الهواء على وحدة المساحة", hint: "يُقاس بالبار أو باسكال", difficulty: "medium" },
+    { id: 504, text: "ما هو اسم المركبة التي تُستخدم للهبوط على المريخ؟", answer: "الروبوتات الجوالة مثل 'بيرسيفيرانس'", hint: "مهمات حديثة", difficulty: "medium" },
+    { id: 505, text: "ما هو اسم أكبر جزيرة في البحر المتوسط؟", answer: "صقلية", hint: "تابعة لإيطاليا", difficulty: "medium" },
+    { id: 506, text: "ما هو الاسم العلمي لمرض السكري؟", answer: "داء السكري", hint: "يتعلق بالأنسولين", difficulty: "medium" },
+    { id: 507, text: "ما هو اسم أول من وضع قوانين كبلر لحركة الكواكب؟", answer: "يوهانس كبلر", hint: "وصف مدارات الكواكب", difficulty: "medium" },
+    { id: 508, text: "ما هو اسم العملية التي يتم فيها تحويل النفايات إلى سماد؟", answer: "التحلل/التسميد (Composting)", hint: "يعيد المواد إلى التربة", difficulty: "medium" },
+    { id: 509, text: "ما هو اسم أكبر حيوان لاحم بري؟", answer: "الدب القطبي", hint: "يعيش في المناطق القطبية", difficulty: "medium" },
+    { id: 510, text: "ما هو اسم النسبة التي تمثل مقدار الدقة في القياسات؟", answer: "الدقة/الانحراف المعياري", hint: "مفاهيم إحصائية", difficulty: "medium" },
+    { id: 511, text: "ما معنى HTML؟", answer: "لغة توصيف النص الفائق", hint: "تستخدم لبناء صفحات الويب", difficulty: "medium" },
+    { id: 512, text: "ما اسم العالم الذي اكتشف البنسلين؟", answer: "ألكسندر فليمنج", hint: "اكتشفه مصادفة عام 1928", difficulty: "medium" },
+    { id: 513, text: "ما هي عاصمة جنوب أفريقيا الإدارية؟", answer: "بريتوريا", hint: "إحدى عواصم جنوب أفريقيا", difficulty: "medium" },
+    { id: 514, text: "ما هو اسم أكبر حوض محيطي في العالم؟", answer: "المحيط الهادئ", hint: "يحتوي خنادق عميقة", difficulty: "medium" },
+    { id: 515, text: "ما هو اسم الطبق التقليدي الإسباني المشهور؟", answer: "الباييّا", hint: "طبق أرز مع مكونات متنوعة", difficulty: "medium" },
+    { id: 516, text: "ما هو اسم المادة التي تُستخدم لصنع الألماس صناعياً؟", answer: "الكربون (في شكل بلوري)", hint: "الماس شكل بلوري للكربون", difficulty: "medium" },
+    { id: 517, text: "ما اسم أعلى جبل في أفريقيا؟", answer: "كيليمنجارو", hint: "يقع في تنزانيا", difficulty: "medium" },
+    { id: 518, text: "ما اسم أكبر مدينة في كازاخستان؟", answer: "ألماتي", hint: "ليست العاصمة الحالية", difficulty: "medium" },
+    { id: 519, text: "ما هو اسم الجهاز الذي يحول الطاقة الحرارية إلى كهرباء؟", answer: "المولد (Thermoelectric/المولد البخاري)", hint: "طرق متعددة", difficulty: "medium" },
+    { id: 520, text: "ما هو مبدأ العمل في المحركات الكهربائية؟", answer: "قوة كهرومغناطيسية بين ملف ومغناطيس", hint: "قانون فاراداي واللورات", difficulty: "medium" }
+];
+
+// ─── UI ───
+const ui = {
+    showToast(message, type = 'error') {
+        if (type === 'error') audioManager.playError();
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.style.background = type === 'info' ? 'var(--secondary)' : 'var(--danger)';
+        toast.innerHTML = `<span>${message}</span>`;
+        container.appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(-20px)';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    },
+    openModal(id) { document.getElementById(id).classList.add('active'); },
+    closeModal(id) { document.getElementById(id).classList.remove('active'); },
+    openBottomSheet(id) {
+        document.getElementById(id).classList.add('active');
+        document.getElementById('hint-overlay').classList.add('active');
+    },
+    closeBottomSheet(id) {
+        document.getElementById(id).classList.remove('active');
+        document.getElementById('hint-overlay').classList.remove('active');
+    }
+};
+
+// ─── GAME ───
+class GameManager {
+    constructor() {
+        this.state = {
+            screen: 'start',
+            players: [],
+            difficulty: 'easy',
+            currentQuestion: null,
+            usedQuestions: new Set(),
+            history: ['start']
+        };
+        this.els = {
+            screens: document.querySelectorAll('.screen'),
+            topBar: document.getElementById('top-bar'),
+            topBarTitle: document.getElementById('top-bar-title'),
+            hintBtn: document.getElementById('hint-btn'),
+            playerList: document.getElementById('player-list-ui'),
+            gameGrid: document.getElementById('game-player-grid'),
+            questionText: document.getElementById('question-text'),
+            answerDisplay: document.getElementById('correct-answer-display'),
+            hintContent: document.getElementById('hint-content'),
+            winnerName: document.getElementById('winner-name-display'),
+            winnerScore: document.getElementById('winner-score-display'),
+            input: document.getElementById('player-name-input'),
+            nextBtn: document.getElementById('next-btn')
+        };
+    }
+
+    goToScreen(screenId) {
+        if (this.state.screen !== screenId) this.state.history.push(screenId);
+        this.state.screen = screenId;
+        audioManager.playClick();
+
+        if (screenId === 'start') {
+            this.els.topBar.style.display = 'none';
+            document.getElementById('start-screen').classList.add('full-height');
+            audioManager.init();
+            audioManager.startMusic();
+        } else {
+            this.els.topBar.style.display = 'flex';
+            document.getElementById('start-screen').classList.remove('full-height');
+            audioManager.stopMusic();
+        }
+
+        const titles = {
+            'player-setup': 'إضافة اللاعبين',
+            'difficulty': 'مستوى الصعوبة',
+            'game': 'الجولة الحالية',
+            'winner': 'النتيجة النهائية',
+            'about': 'عن المطور'
+        };
+        this.els.topBarTitle.textContent = titles[screenId] || 'تحدي العباقرة';
+        this.els.hintBtn.style.visibility = screenId === 'game' ? 'visible' : 'hidden';
+
+        this.els.screens.forEach(s => s.classList.remove('active'));
+        document.getElementById(`${screenId}-screen`).classList.add('active');
+    }
+
+    handleBack() {
+        if (this.state.history.length > 1) {
+            const current = this.state.history[this.state.history.length - 1];
+            if (current === 'game') {
+                ui.openModal('exit-modal');
+                return;
+            }
+            this.state.history.pop();
+            const prev = this.state.history[this.state.history.length - 1];
+            this.state.screen = prev;
+            this.els.screens.forEach(s => s.classList.remove('active'));
+            document.getElementById(`${prev}-screen`).classList.add('active');
+            if (prev === 'start') {
+                this.els.topBar.style.display = 'none';
+                document.getElementById('start-screen').classList.add('full-height');
+                audioManager.startMusic();
+            } else {
+                this.els.topBar.style.display = 'flex';
+                document.getElementById('start-screen').classList.remove('full-height');
+                audioManager.stopMusic();
+            }
+        }
+    }
+
+    confirmExit() {
+        ui.closeModal('exit-modal');
+        stopConfetti();
+        this.state.history = ['start'];
+        this.goToScreen('start');
+    }
+
+    addPlayer() {
+        const name = this.els.input.value.trim();
+        if (!name || name.length < 2) { ui.showToast('الاسم قصير جداً'); return; }
+        if (this.state.players.find(p => p.name === name)) { ui.showToast('هذا الاسم مضاف مسبقاً'); return; }
+        this.state.players.push({ id: Date.now(), name, score: 0 });
+        this.els.input.value = '';
+        this.els.input.focus();
+        this.renderPlayerList();
+        this.updateNextBtn();
+    }
+
+    removePlayer(id) {
+        this.state.players = this.state.players.filter(p => p.id !== id);
+        this.renderPlayerList();
+        this.updateNextBtn();
+    }
+
+    updateNextBtn() {
+        const ok = this.state.players.length >= 2;
+        this.els.nextBtn.disabled = !ok;
+    }
+
+    renderPlayerList() {
+        this.els.playerList.innerHTML = '';
+        if (!this.state.players.length) {
+            this.els.playerList.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><p>لا يوجد لاعبين بعد</p></div>`;
+            return;
+        }
+        this.state.players.forEach(p => {
+            const li = document.createElement('li');
+            li.className = 'player-item';
+            li.innerHTML = `<span style="font-weight:700;font-size:1rem;">${p.name}</span><button class="delete-btn" onclick="game.removePlayer(${p.id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>`;
+            this.els.playerList.appendChild(li);
+        });
+    }
+
+    goToDifficulty() {
+        if (this.state.players.length < 2) { ui.showToast('يجب إضافة لاعبين اثنين على الأقل'); return; }
+        this.goToScreen('difficulty');
+    }
+
+    startGame(difficulty) {
+        this.state.difficulty = difficulty;
+        this.state.usedQuestions.clear();
+        this.state.players.forEach(p => p.score = 0);
+        this.goToScreen('game');
+        this.nextQuestion();
+    }
+
+    nextQuestion() {
+        ui.closeBottomSheet('hint-sheet');
+        let candidates = QuestionBank.filter(q =>
+            (this.state.difficulty === 'mixed' || q.difficulty === this.state.difficulty) &&
+            !this.state.usedQuestions.has(q.id)
+        );
+        if (!candidates.length) {
+            this.state.usedQuestions.clear();
+            candidates = this.state.difficulty === 'mixed'
+                ? QuestionBank
+                : QuestionBank.filter(q => q.difficulty === this.state.difficulty);
+        }
+        const q = candidates[Math.floor(Math.random() * candidates.length)];
+        this.state.currentQuestion = q;
+        this.state.usedQuestions.add(q.id);
+
+        const qCard = document.querySelector('.question-card');
+        qCard.style.animation = 'none';
+        qCard.offsetHeight;
+        qCard.style.animation = 'slideDown 0.4s ease-out';
+
+        this.els.questionText.textContent = q.text;
+        this.els.answerDisplay.textContent = q.answer;
+        this.renderGameGrid();
+    }
+
+    openHint() {
+        if (this.state.currentQuestion && this.state.currentQuestion.hint) {
+            this.els.hintContent.textContent = this.state.currentQuestion.hint;
+            ui.openBottomSheet('hint-sheet');
+        } else {
+            ui.showToast('لا يوجد تلميح لهذا السؤال', 'info');
+        }
+    }
+
+    renderGameGrid() {
+        this.els.gameGrid.innerHTML = '';
+        this.state.players.forEach(p => {
+            const btn = document.createElement('button');
+            btn.className = 'player-btn';
+            btn.onclick = (e) => this.awardPoint(p.id, e);
+            btn.innerHTML = `<span class="player-name">${p.name}</span><span class="player-score" id="score-${p.id}">${p.score}</span>`;
+            this.els.gameGrid.appendChild(btn);
+        });
+    }
+
+    awardPoint(playerId, event) {
+        const player = this.state.players.find(p => p.id === playerId);
+        if (!player) return;
+        player.score++;
+        audioManager.playCorrect();
+
+        const btn = event.currentTarget;
+        const rect = btn.getBoundingClientRect();
+        const floatEl = document.createElement('div');
+        floatEl.className = 'float-score';
+        floatEl.textContent = '+1';
+        floatEl.style.left = (rect.left + rect.width / 2 - 20) + 'px';
+        floatEl.style.top = (rect.top + 20) + 'px';
+        document.body.appendChild(floatEl);
+        setTimeout(() => floatEl.remove(), 1000);
+
+        const scoreEl = document.getElementById(`score-${player.id}`);
+        if (scoreEl) {
+            scoreEl.textContent = player.score;
+            scoreEl.style.transform = 'scale(1.5)';
+            setTimeout(() => scoreEl.style.transform = 'scale(1)', 200);
+        }
+
+        if (player.score >= 10) {
+            setTimeout(() => this.showWinner(player), 600);
+        } else {
+            setTimeout(() => this.nextQuestion(), 800);
+        }
+    }
+
+    showWinner(player) {
+        this.els.winnerName.textContent = player.name;
+        this.els.winnerScore.textContent = player.score;
+        this.goToScreen('winner');
+        audioManager.playWin();
+        startConfetti();
+    }
+
+    restartGame() {
+        stopConfetti();
+        this.state.players.forEach(p => p.score = 0);
+        this.state.usedQuestions.clear();
+        this.goToScreen('difficulty');
+    }
+
+    resetAll() {
+        stopConfetti();
+        this.state.players = [];
+        this.state.history = ['start'];
+        this.renderPlayerList();
+        this.updateNextBtn();
+        this.goToScreen('start');
+    }
+}
+
+const game = new GameManager();
+
+// ─── CONFETTI ───
+const canvas = document.getElementById('confetti-canvas');
+const ctx2d = canvas.getContext('2d');
+let confettiId;
+
+function resizeCanvas() {
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+}
+
+const ro = new ResizeObserver(resizeCanvas);
+ro.observe(canvas);
+resizeCanvas();
+
+const COLORS = ['#FF9F43','#54A0FF','#1DD1A1','#FECA57','#FF6B6B'];
+let particles = [];
+
+function startConfetti() {
+    particles = [];
+    for (let i = 0; i < 80; i++) {
+        particles.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height - canvas.height,
+            color: COLORS[Math.floor(Math.random() * COLORS.length)],
+            size: Math.random() * 8 + 4,
+            vy: Math.random() * 3 + 2,
+            vx: Math.random() * 2 - 1
+        });
+    }
+    const end = Date.now() + 4000;
+    (function anim() {
+        if (Date.now() > end) { stopConfetti(); return; }
+        ctx2d.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => {
+            p.y += p.vy; p.x += p.vx;
+            ctx2d.fillStyle = p.color;
+            ctx2d.fillRect(p.x, p.y, p.size, p.size);
+            if (p.y > canvas.height) { p.y = -10; p.x = Math.random() * canvas.width; }
+        });
+        confettiId = requestAnimationFrame(anim);
+    })();
+}
+
+function stopConfetti() {
+    if (confettiId) cancelAnimationFrame(confettiId);
+    ctx2d.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+// ─── SERVICE WORKER for PWA ───
+if ('serviceWorker' in navigator) {
+    const sw = `
+self.addEventListener('install', e => self.skipWaiting());
+self.addEventListener('activate', e => clients.claim());
+self.addEventListener('fetch', e => {
+    e.respondWith(
+        caches.open('genius-v1').then(cache =>
+            cache.match(e.request).then(r => r || fetch(e.request).then(res => {
+                cache.put(e.request, res.clone());
+                return res;
+            }).catch(() => r))
+        )
+    );
+});
+`;
+    const blob = new Blob([sw], { type: 'application/javascript' });
+    const swURL = URL.createObjectURL(blob);
+    navigator.serviceWorker.register(swURL).catch(() => {});
+}
+
+// Prevent bounce scroll on iOS
+document.addEventListener('touchmove', (e) => {
+    if (e.target.closest('.screen') || e.target.closest('.player-grid') || e.target.closest('.bottom-sheet')) return;
+    e.preventDefault();
+}, { passive: false });
+</script>
+</body>
+</html>
