@@ -1,10 +1,10 @@
+<img width="1024" height="434" alt="image" src="https://github.com/user-attachments/assets/8f50e083-9733-4551-a9f9-c45e6777ffe2" />
+
 # Tahadiy Aleabaqira
 
 Interactive quiz game with multiple difficulty levels and scoring system.
 
 > Built in 45 minutes as part of a team challenge to develop a complete game within 60 minutes.
-
-<img width="1024" height="434" alt="image" src="https://github.com/user-attachments/assets/8f50e083-9733-4551-a9f9-c45e6777ffe2" />
 
 ## Features
 
