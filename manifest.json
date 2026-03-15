@@ -3,7 +3,7 @@
   "name": "تحدي العباقرة",
   "short_name": "العباقرة",
   "description": "لعبة أسئلة وتحديات ممتعة لاختبار الذكاء وسرعة البديهة بمستويات متعددة.",
-  "start_url": "/index.html",
+  "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
